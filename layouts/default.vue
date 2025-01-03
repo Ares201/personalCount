@@ -88,7 +88,7 @@
       fixed
     >
       <v-list>
-        <!-- Cambiar de Laso -->
+        <!-- Cambiar de Lado -->
         <v-list-item @click.native="right = !right">
           <v-list-item-action>
             <v-icon light>
@@ -106,6 +106,7 @@
           </v-list-item-action>
           <v-list-item-title>Cerrar Sesion</v-list-item-title>
          </v-list-item>
+         <!-- Modo Oscuro -->
       </v-list>
     </v-navigation-drawer>
     <v-footer
@@ -138,10 +139,6 @@ export default {
             {
               title: 'Usuarios',
               to: '/mantenimiento/usuarios'
-            },
-            {
-              title: 'Permisos',
-              to: '/inspire'
             }
           ]
         }

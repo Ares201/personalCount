@@ -22,7 +22,11 @@ export default {
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
   ],
-
+  // Firebase
+  target: 'static', // Configurar Nuxt en modo estático
+  generate: {
+    dir: 'dist', // Carpeta donde se generarán los archivos para el despliegue
+  },
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     '~/plugins/firebase.js'
