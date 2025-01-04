@@ -2,7 +2,7 @@
   <v-card height="100%" tile>
     <v-card-title>
       <span class="text-h6">Gestión de Usuarios</span>
-      <v-spacer></v-spacer>
+      <v-spacer />
       <v-btn color="primary" small fab dark @click="dialogComponent = true"><v-icon dark>mdi-plus</v-icon></v-btn>
     </v-card-title>
     <v-card-text>
@@ -59,11 +59,6 @@ export default {
       selectedUser: null
     }
   },
-  computed: {
-    dialogTitle() {
-      return this.currentUser.id ? 'Editar Usuario' : 'Agregar Usuario'
-    }
-  },
   async beforeMount() {
     await this.fetchUsers()
   },
@@ -72,7 +67,7 @@ export default {
       try {
         this.usuarios = await getUsers()
       } catch (error) {
-        console.error('Error al obtener usuarios:', error)
+        console.error('Error al obtener Registros.', error)
       }
     },
     editUser(user) {

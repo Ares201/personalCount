@@ -15,20 +15,14 @@
           router
           exact
         >
-          <v-icon small>{{ item.icon }}</v-icon>
-          <v-list-item-content>
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
-          </v-list-item-content>
           <v-list-group
-            v-if="item.children && item.children.length > 0"
             v-model="item.active"
             no-action
             offset-y
           >
             <template v-slot:activator>
-              <v-list-item-title>{{ item.title }}</v-list-item-title>
+              <v-list-item-title><v-icon>{{ item.icon }}</v-icon> {{ item.title }}</v-list-item-title>
             </template>
-            <!-- Children list -->
             <v-list-item
               v-for="(child, j) in item.children"
               :key="j"
@@ -42,7 +36,6 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-
     <v-app-bar
       :clipped-left="clipped"
       fixed
@@ -139,6 +132,20 @@ export default {
             {
               title: 'Usuarios',
               to: '/mantenimiento/usuarios'
+            }
+          ]
+        },
+        {
+          icon: 'mdi-cash',
+          title: 'Finanzas',
+          children: [
+            {
+              title: 'Ingresos',
+              to: '/finanzas/ingresos'
+            },
+            {
+              title: 'Salidas',
+              to: '/finanzas/salidas'
             }
           ]
         }
