@@ -21,7 +21,7 @@
         ></v-text-field>
         <v-select
           v-model="ingreso.descripcion"
-          :items="['Abono', 'Ventas', 'Otros']"
+          :items="['Saturno', 'Studioxperto', 'Otros']"
           label="Descripción"
           outlined
           required

@@ -1,5 +1,10 @@
 # personalCount
 
+<!-- Deploy Proyecto -->
+npm run build
+firebase deploy --only hosting
+
+
 ## Build Setup
 
 ```bash

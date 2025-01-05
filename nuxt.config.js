@@ -25,7 +25,7 @@ export default {
   // Firebase
   target: 'static', // Configurar Nuxt en modo estático
   generate: {
-    dir: 'dist', // Carpeta donde se generarán los archivos para el despliegue
+    fallback: true  // Si usas rutas dinámicas, puedes configurarlo para un fallback a index.html
   },
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [

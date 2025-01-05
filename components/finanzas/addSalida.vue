@@ -12,16 +12,21 @@
           outlined
           required
           type="date"
-        ></v-text-field>
+        />
         <v-text-field
           label="Monto"
           v-model="salida.monto"
           outlined
           required
-        ></v-text-field>
-        <v-select
+        />
+        <v-text-field
+          label="Categoria"
+          v-model="salida.categoria"
+          outlined
+          required
+        />
+        <v-text-field
           v-model="salida.descripcion"
-          :items="['Abono', 'Ventas', 'Otros']"
           label="Descripción"
           outlined
           required
@@ -69,14 +74,16 @@ methods: {
         await updateBox(this.salida.id, {
           fecha: this.salida.fecha,
           monto: this.salida.monto,
-          descripcion: this.salida.descripcion
+          descripcion: this.salida.descripcion,
+          categoria: this.salida.categoria
         })
       } else {
         await createBox({
           tipo: 'Salida',
           fecha: this.salida.fecha,
           monto: this.salida.monto,
-          descripcion: this.salida.descripcion
+          descripcion: this.salida.descripcion,
+          categoria: this.salida.categoria
         })
       }
       this.$emit('saveSalida')
@@ -91,7 +98,8 @@ methods: {
       id: null,
       fecha: '',
       monto: '',
-      descripcion: ''
+      descripcion: '',
+      categoria: ''
     }
   },
 }
