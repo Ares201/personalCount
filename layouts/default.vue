@@ -100,6 +100,12 @@
           <v-list-item-title>Cerrar Sesion</v-list-item-title>
          </v-list-item>
          <!-- Modo Oscuro -->
+          <v-list-item>
+            <v-list-item-action>
+              <switchMode />
+            </v-list-item-action>
+            <v-list-item-title>Modo Oscuro</v-list-item-title>
+          </v-list-item>
       </v-list>
     </v-navigation-drawer>
     <v-footer
@@ -112,7 +118,11 @@
 </template>
 
 <script>
+import switchMode from '../components/colorMode.vue';
 export default {
+  components: {
+    switchMode
+  },
   name: 'DefaultLayout',
   data () {
     return {

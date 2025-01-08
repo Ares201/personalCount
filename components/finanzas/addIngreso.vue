@@ -15,7 +15,7 @@
         ></v-text-field>
         <v-text-field
           label="Monto"
-          v-model="ingreso.monto"
+          v-model.number="ingreso.monto"
           outlined
           required
         ></v-text-field>
@@ -42,7 +42,7 @@ export default {
 name: 'addIngreso',
 props: {
   dialog: { type: Boolean, default: false },
-  boxs: { type: Object, default: () => ({ id: null, fecha: '', monto: '', descripcion: ''}) }
+  boxs: { type: Object, default: () => ({ id: null, fecha: '', monto: 0 , descripcion: ''}) }
 },
 data() {
   return {

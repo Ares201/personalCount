@@ -9,6 +9,7 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
+    "@nuxtjs/color-mode": "^2.1.1",
     "chart.js": "^2.9.4",
     "core-js": "^3.25.3",
     "firebase": "^11.1.0",

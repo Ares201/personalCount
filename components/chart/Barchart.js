@@ -1,9 +1,9 @@
 // components/BarChart.js
-import { Doughnut  } from 'vue-chartjs';
+import { Bar  } from 'vue-chartjs';
 
 export default {
   name: 'BarChart',
-  extends: Doughnut ,
+  extends: Bar ,
   props: {
     chartData: {
       type: Object,

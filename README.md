@@ -1,9 +1,10 @@
 # personalCount
-
 <!-- Deploy Proyecto -->
 npm run build
-firebase deploy --only hosting
-
+npm run generate
+firebase login
+firebase init hosting
+firebase deploy
 
 ## Build Setup
 
