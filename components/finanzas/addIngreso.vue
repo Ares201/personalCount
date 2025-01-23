@@ -15,7 +15,7 @@
         ></v-text-field>
         <v-text-field
           label="Monto"
-          v-model.number="ingreso.monto"
+          v-model="ingreso.monto"
           outlined
           required
         ></v-text-field>

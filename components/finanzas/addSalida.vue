@@ -19,7 +19,8 @@
           outlined
           required
         />
-        <v-text-field
+        <v-select
+          :items="['Compras', 'Prestamo', 'Otros']"
           label="Categoria"
           v-model="salida.categoria"
           outlined
@@ -47,7 +48,7 @@ export default {
 name: 'addSalida',
 props: {
   dialog: { type: Boolean, default: false },
-  boxs: { type: Object, default: () => ({ id: null, fecha: '', monto: '', descripcion: ''}) }
+  boxs: { type: Object, default: () => ({ id: null, fecha: '', monto: 0, descripcion: ''}) }
 },
 data() {
   return {

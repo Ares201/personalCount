@@ -17,6 +17,9 @@
         <template v-slot:[`item.index`]="{ index }">
           {{ index + 1 }}
         </template>
+        <template v-slot:[`item.monto`]="{ item }">
+          S/.{{ item.monto }}
+        </template>
         <template v-slot:[`item.acciones`]="{ item }">
           <v-icon small color="blue" @click="editSalida(item)">mdi-pencil</v-icon>
           <v-icon small color="red" @click="deleteSalida(item.id)">mdi-delete</v-icon>
@@ -47,6 +50,7 @@ export default {
         { text: 'Tipo', value: 'tipo', sortable: false },
         { text: 'Fecha', value: 'fecha', sortable: false },
         { text: 'Monto', value: 'monto', sortable: false },
+        { text: 'Categoria', value: 'categoria', sortable: false },
         { text: 'Descripción', value: 'descripcion', sortable: false },
         { text: 'Acciones', value: 'acciones', sortable: false }
       ],

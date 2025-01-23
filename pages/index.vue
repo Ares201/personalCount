@@ -4,7 +4,11 @@
       <span class="text-h6">Gráficos de Finanzas</span>
       <v-spacer />
     </v-card-title>
-    <BarChart :chart-data="chartData" :options="chartOptions" />
+    <v-row>
+      <v-col cols="12" md="6">
+        <BarChart :chart-data="chartData" :options="chartOptions" />
+      </v-col>
+    </v-row>
   </v-card>
 </template>
 
@@ -53,8 +57,8 @@ export default {
         .reduce((total, item)=> total + item.monto, 0)
         // Saldo Total
         const SaldoTotal = totalIngresos - TotalSalidas
-        this.chartData.datasets[0].data = [totalIngresos, TotalSalidas, SaldoTotal]
-        this.chartData.labels = [ `Ingresos - S/. ${totalIngresos}`, `Salidas - S/. ${TotalSalidas}`, `Saldo - S/. ${SaldoTotal}`]
+        this.chartData.datasets[0].data = [SaldoTotal, totalIngresos, TotalSalidas]
+        this.chartData.labels = [ `Saldo - S/. ${SaldoTotal}`, `Ingresos - S/. ${totalIngresos}`, `Salidas - S/. ${TotalSalidas}`]
       } catch (error) {
         console.log('Error al obtener los datos:', error)
       }

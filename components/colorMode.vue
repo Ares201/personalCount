@@ -1,23 +1,18 @@
 <template>
-  <div>
-    <!-- <p>Modo Actual: {{ $colorMode.preference }}</p> -->
-    <v-icon
-      v-if="$colorMode.preference === 'dark'"
+ <div>
+    <v-btn
+      icon
       @click="toggleColorMode"
-      color="white"
-      class="icon"
     >
-      mdi-moon-waxing-crescent
-    </v-icon>
-    <v-icon
-      v-else
-      @click="toggleColorMode"
-      color="black"
-      class="icon"
-    >
-      mdi-weather-sunny
-    </v-icon>
-</div>
+      <v-icon
+        :color="$colorMode.preference === 'dark' ? 'white' : 'black'"
+        class="icon"
+      >
+        {{ $colorMode.preference === 'dark' ? 'mdi-weather-sunny' : 'mdi-moon-waxing-crescent' }}
+      </v-icon>
+    </v-btn>
+    <span>{{ $colorMode.preference === 'dark' ? 'Modo Claro' : 'Modo Oscuro' }}</span>
+  </div>
 </template>
 <script>
 export default {

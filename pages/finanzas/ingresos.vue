@@ -17,6 +17,9 @@
         <template v-slot:[`item.index`]="{ index }">
           {{ index + 1 }}
         </template>
+        <template v-slot:[`item.monto`]="{ item }">
+          S/.{{ item.monto }}
+        </template>
         <template v-slot:[`item.acciones`]="{ item }">
           <v-icon small color="blue" @click="editIngreso(item)">mdi-pencil</v-icon>
           <v-icon small color="red" @click="deleteIngreso(item.id)">mdi-delete</v-icon>
