@@ -41,37 +41,55 @@
       <v-col cols="12" sm="12">
         <v-row>
           <v-col v-for="box in boxs" :key="box.id" cols="12" sm="6" md="4">
-            <v-card class="mx-2" tile>
-              <v-card-text>
-                <p>{{ box.monto }}</p>
-              </v-card-text>
+            <v-card
+              class="pa-2 mb-4" style="border: 2px solid orange; border-radius: 10px;"
+            >
+              <v-row>
+                <v-col cols="4" class="d-flex justify-center align-center">
+                  <v-icon color="primary" large>mdi-chart-donut</v-icon>
+                </v-col>
+                <v-col cols="8">
+                  <v-chip
+                    class="ma-2"
+                    color="orange"
+                    text-color="white"
+                  >
+                    {{ box.estado ? 'Cancelado' : 'Pendiente' }}
+                  </v-chip>
+                  <v-card-text>
+                    <p>{{ box.concepto }}</p>
+                    <strong>Monto:</strong>
+                    <p>S/.{{ box.monto }}</p>
+                  </v-card-text>
+                </v-col>
+              </v-row>
             </v-card>
           </v-col>
         </v-row>
       </v-col>
     </v-row>
     <!-- Componente addCompra -->
-    <!-- <addCompra
+    <addCompra
       :dialog = "dialogComponent"
       @closedialog="closedialog"
       @saveCompra="fetchCompras"
       :boxs="selectedCompra"
-    /> -->
+    />
   </v-card>
 </template>
 <script>
 import { getBoxs, deleteBox } from '../../services/boxServices';
-// import addCompra from '../../components/finanzas/addCompra.vue';
+import addCompra from '../../components/finanzas/addCompra.vue';
 export default {
   name: 'Compras',
   components :{
-    // addCompra
+    addCompra
   },
   data() {
     return {
       headers: [
         { text: '#', value: 'index', sortable: false },
-        { text: 'Concepto', value: 'Concepto', sortable: false },
+        { text: 'Concepto', value: 'concepto', sortable: false },
         { text: 'Fecha', value: 'fecha', sortable: false },
         { text: 'Monto', value: 'monto', sortable: false },
         { text: 'Descripción', value: 'descripcion', sortable: false },
@@ -94,7 +112,7 @@ export default {
     async fetchCompras(){
       try {
         const allBoxs = await getBoxs()
-        this.boxs = allBoxs.filter(box => box.tipo === 'Ingreso')
+        this.boxs = allBoxs.filter(box => box.tipo === 'Compra')
       } catch (error) {
         console.log('Error al obtener Registros', error)
       }

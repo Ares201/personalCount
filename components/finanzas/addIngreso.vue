@@ -20,11 +20,16 @@
           required
         ></v-text-field>
         <v-select
-          v-model="ingreso.descripcion"
+          v-model="ingreso.categoria"
           :items="['Saturno', 'Studioxperto', 'Otros']"
-          label="Descripción"
+          label="Categoria"
           outlined
           required
+        />
+        <v-text-field
+          v-model="ingreso.descripcion"
+          label="Descripción"
+          outlined
         />
       </v-form>
     </v-card-text>
@@ -42,7 +47,7 @@ export default {
 name: 'addIngreso',
 props: {
   dialog: { type: Boolean, default: false },
-  boxs: { type: Object, default: () => ({ id: null, fecha: '', monto: 0 , descripcion: ''}) }
+  boxs: { type: Object, default: () => ({ id: null, fecha: '', monto: 0 , categoria: '', descripcion: ''}) }
 },
 data() {
   return {
@@ -52,7 +57,7 @@ data() {
 watch: {
   boxs: {
     handler(newIngreso) {
-      this.ingreso = { ...newIngreso }
+      this.ingreso = { ...newIngreso, monto: parseFloat(newIngreso.monto) }
     },
     deep: true
   }
@@ -65,10 +70,12 @@ computed: {
 methods: {
   async saveIngreso() {
     try {
+      this.ingreso.monto = parseFloat(this.ingreso.monto)
       if (this.ingreso.id) {
         await updateBox(this.ingreso.id, {
           fecha: this.ingreso.fecha,
           monto: this.ingreso.monto,
+          categoria: this.ingreso.categoria,
           descripcion: this.ingreso.descripcion
         })
       } else {
@@ -76,6 +83,7 @@ methods: {
           tipo: 'Ingreso',
           fecha: this.ingreso.fecha,
           monto: this.ingreso.monto,
+          categoria: this.ingreso.categoria,
           descripcion: this.ingreso.descripcion
         })
       }
@@ -91,7 +99,8 @@ methods: {
       id: null,
       fecha: '',
       monto: '',
-      descripcion: ''
+      caegoria: '',
+      descripcion: '',
     }
   },
 }
