@@ -19,34 +19,38 @@
             <v-col cols="12" sm="6">
               <v-select
                 v-model="compra.concepto"
-                :items="['PAGOS MENSUALES', 'Otros']"
+                :items="['PAGOS MENSUALES', 'TECNOLOGIA', 'COCINA', 'MECANICA', 'OTROS']"
                 label="Concepto"
                 outlined
                 required
               />
             </v-col>
             <v-col cols="12" md="6">
-              <v-select
+              <v-text-field
                 v-model="compra.descripcion"
-                :items="['Saturno', 'Studioxperto', 'Otros']"
                 label="Descripción"
                 outlined
                 required
               />
             </v-col>
           </v-row>
-          <v-row justify="center">
-            <v-btn color="success darken-1" class="ml-4" @click="dialogDetail = true">
-              <v-icon>mdi-plus</v-icon> Añadir Detalle
-            </v-btn>
+          <v-row dense>
+            <v-col cols="7" md="8">
+              <v-btn color="success darken-1" class="ml-4" @click="dialogDetail = true">
+                <v-icon>mdi-plus</v-icon>
+                <span class="d-none d-md-inline">Añadir Detalle</span>
+              </v-btn>
+            </v-col>
             <v-spacer/>
-            <v-chip
-              class="ma-2"
-              color="orange"
-              text-color="white"
-            >
-              {{ compra.monto ? 'Total: S/. ' + compra.monto : 'Total: S/. 0' }}
-            </v-chip>
+            <v-col cols="5" md="4">
+              <v-chip
+                class="ma-2"
+                color="orange"
+                text-color="white"
+              >
+                {{ compra.monto ? 'Total: S/. ' + compra.monto : 'Total: S/. 0' }}
+              </v-chip>
+            </v-col>
           </v-row>
           <v-row>
             <v-col cols="12">

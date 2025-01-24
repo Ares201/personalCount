@@ -58,7 +58,7 @@ data() {
 watch: {
   boxs: {
     handler(newSalida) {
-      this.salida = { ...newSalida }
+      this.salida = { ...newSalida, monto: parseFloat(newSalida.monto) }
     },
     deep: true
   }
@@ -71,6 +71,7 @@ computed: {
 methods: {
   async saveSalida() {
     try {
+      this.salida.monto = parseFloat(this.salida.monto)
       if (this.salida.id) {
         await updateBox(this.salida.id, {
           fecha: this.salida.fecha,

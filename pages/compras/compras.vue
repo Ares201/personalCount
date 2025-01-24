@@ -1,11 +1,11 @@
 <template>
   <v-card height="100%" tile>
     <v-card-title>
-      <v-row>
-        <v-col cols="10" md="10" class="mb-0">
+      <v-row dense>
+        <v-col cols="7" md="10" class="mb-0">
           <span class="text-h6">Compras y Pagos</span>
         </v-col>
-        <v-col cols="2" md="2" class="mb-0">
+        <v-col cols="5" md="2" class="mb-0">
           <v-switch
             @click="switchMode"
             :label="model ? 'Tabla' : 'Tarjetas'"
@@ -42,6 +42,7 @@
         <v-row>
           <v-col v-for="box in boxs" :key="box.id" cols="12" sm="6" md="4">
             <v-card
+              @click="editCompra(box)"
               class="pa-2 mb-4" style="border: 2px solid orange; border-radius: 10px;"
             >
               <v-row>
