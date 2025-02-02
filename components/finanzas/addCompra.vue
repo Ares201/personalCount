@@ -17,9 +17,8 @@
               />
             </v-col>
             <v-col cols="12" sm="6">
-              <v-select
+              <v-text-field
                 v-model="compra.concepto"
-                :items="['PAGOS MENSUALES', 'TECNOLOGIA', 'COCINA', 'MECANICA', 'OTROS']"
                 label="Concepto"
                 outlined
                 required

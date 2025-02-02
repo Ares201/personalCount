@@ -31,6 +31,11 @@
         <template v-slot:[`item.monto`]="{ item }">
           S/.{{ item.monto }}
         </template>
+        <template v-slot:[`item.estado`]="{ item }">
+          <v-chip :color="item.estado ? 'red' : 'green'" dark>
+            {{ item.estado ? 'Pendiente' : 'Cancelado' }}
+          </v-chip>
+        </template>
         <template v-slot:[`item.acciones`]="{ item }">
           <v-icon small color="blue" @click="editCompra(item)">mdi-pencil</v-icon>
           <v-icon small color="red" @click="deleteCompra(item.id)">mdi-delete</v-icon>
@@ -45,20 +50,23 @@
               @click="editCompra(box)"
               class="pa-2 mb-4" style="border: 2px solid orange; border-radius: 10px;"
             >
-              <v-row>
+              <v-row dense>
                 <v-col cols="4" class="d-flex justify-center align-center">
-                  <v-icon color="primary" large>mdi-chart-donut</v-icon>
+                  <v-progress-circular
+                    :value="calculateProgress(box)"
+                    color="primary"
+                    size="50"
+                    width="5"
+                  >
+                    {{ calculateProgress(box) }}%
+                  </v-progress-circular>
                 </v-col>
                 <v-col cols="8">
-                  <v-chip
-                    class="ma-2"
-                    color="orange"
-                    text-color="white"
-                  >
+                  <v-chip class="ma-2" :color="box.estado ? 'green' : 'orange'" text-color="white">
                     {{ box.estado ? 'Cancelado' : 'Pendiente' }}
                   </v-chip>
                   <v-card-text>
-                    <p>{{ box.concepto }}</p>
+                    <p>{{ box.descripcion }}</p>
                     <strong>Monto:</strong>
                     <p>S/.{{ box.monto }}</p>
                   </v-card-text>
@@ -90,10 +98,10 @@ export default {
     return {
       headers: [
         { text: '#', value: 'index', sortable: false },
-        { text: 'Concepto', value: 'concepto', sortable: false },
         { text: 'Fecha', value: 'fecha', sortable: false },
-        { text: 'Monto', value: 'monto', sortable: false },
+        { text: 'Concepto', value: 'concepto', sortable: false },
         { text: 'Descripción', value: 'descripcion', sortable: false },
+        { text: 'Monto', value: 'monto', sortable: false },
         { text: 'Estado', value: 'estado', sortable: false },
         { text: 'Acciones', value: 'acciones', sortable: false }
       ],
@@ -107,13 +115,24 @@ export default {
     await this.fetchCompras()
   },
   methods: {
+    calculateProgress(box) {
+      if (!box.detailBox || box.detailBox.length === 0) return 0;
+      const totalTasks = box.detailBox.length;
+      const completedTasks = box.detailBox.filter(detail => detail.estado).length;
+      return Math.round((completedTasks / totalTasks) * 100);
+    },
     switchMode(){
       this.model = !this.model
     },
     async fetchCompras(){
       try {
         const allBoxs = await getBoxs()
-        this.boxs = allBoxs.filter(box => box.tipo === 'Compra')
+        this.boxs = allBoxs
+        .filter(box => box.tipo === 'Compra')
+        .map(box => ({
+          ...box,
+          estado: box.detailBox.length > 0 && box.detailBox.every(detail => detail.estado)
+        }));
       } catch (error) {
         console.log('Error al obtener Registros', error)
       }
