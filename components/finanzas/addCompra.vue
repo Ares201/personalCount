@@ -35,9 +35,8 @@
           </v-row>
           <v-row dense>
             <v-col cols="7" md="8">
-              <v-btn color="success darken-1" class="ml-4" @click="dialogDetail = true">
+              <v-btn color="success darken-1" icon outlined @click="dialogDetail = true">
                 <v-icon>mdi-plus</v-icon>
-                <span class="d-none d-md-inline">Añadir Detalle</span>
               </v-btn>
             </v-col>
             <v-spacer/>
@@ -51,33 +50,41 @@
               </v-chip>
             </v-col>
           </v-row>
-          <v-row>
+          <v-row class="m-0">
             <v-col cols="12">
-              <v-list>
-                <v-list-item v-for="(detail, index) in detailBox" :key="index">
-                  <v-list-item-content>
-                    <v-list-item-title>
-                      {{ detail.detalle }} - S/.{{ detail.monto }}
-                    </v-list-item-title>
-                    <v-list-item-subtitle>
-                      {{ detail.estado ? 'Cancelado' : 'Pendiente' }}
-                    </v-list-item-subtitle>
-                  </v-list-item-content>
-                  <v-list-item-action>
-                    <div style="display: flex; align-items: center;">
-                      <v-checkbox v-model="detail.estado" />
-                      <v-icon
-                        @click="removeDetail(index)"
-                        color="red"
-                        class="ml-2"
-                        title="Eliminar"
-                      >
-                        mdi-delete
-                      </v-icon>
-                    </div>
-                  </v-list-item-action>
-                </v-list-item>
-              </v-list>
+              <div
+                class="pb-4"
+                v-for="(detail, index) in detailBox" :key="index"
+                v-touch:swipe.right="() => onSwipeRight(index)"
+                v-touch:swipe.left="() => onSwipeLeft(index)"
+              >
+                <v-row dense>
+                  <v-col cols="1" class="mr-2" align-center>
+                    <v-chip color="primary" small>{{ index + 1 }}</v-chip>
+                  </v-col>
+                  <v-col cols="7">
+                    <v-text-field
+                      v-model="detail.detalle"
+                      label="Detalle"
+                      dense
+                      hide-details
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="3">
+                    <v-text-field
+                      v-model="detail.monto"
+                      label="Monto"
+                      type="number"
+                      dense
+                      hide-details
+                    >
+                      <template v-slot:prepend-inner>
+                        <span class="ml-1">S/</span>
+                      </template>
+                    </v-text-field>
+                  </v-col>
+                </v-row>
+              </div>
             </v-col>
           </v-row>
           <!-- Modal para detalles -->
@@ -127,6 +134,7 @@
 
 <script>
 import { createBox, updateBox } from '../../services/boxServices';
+
 export default {
 name: 'addCompra',
 props: {
@@ -169,6 +177,21 @@ computed: {
   }
 },
 methods: {
+  onSwipeRight(index) {
+    // Mostrar el botón de eliminar para este detalle
+    this.$set(this.detailBox[index], 'showDelete', true);
+  },
+  onSwipeLeft(index) {
+    // Ocultar el botón de eliminar al hacer swipe a la izquierda
+    this.$set(this.detailBox[index], 'showDelete', false);
+  },
+  changeStatus(detail){
+    console.log(detail)
+    detail.estado = !detail.estado
+  },
+  removeDetail(index) {
+    this.detailBox.splice(index, 1);
+  },
   addDetail() {
     if (this.newDetail.detalle && this.newDetail.monto) {
       this.detailBox.push({
@@ -180,9 +203,6 @@ methods: {
     } else {
       alert('Por favor, complete todos los campos.');
     }
-  },
-  removeDetail(index) {
-    this.detailBox.splice(index, 1);
   },
   async saveCompra() {
     try {

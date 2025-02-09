@@ -1,12 +1,12 @@
 <template>
   <v-card height="100%" tile>
     <v-card-title>
-      <span class="text-h6">Gráficos de Finanzas</span>
+      <span class="text-h6">Movimiento de Efectivo</span>
       <v-spacer />
     </v-card-title>
     <v-row>
       <v-col cols="12" md="6">
-        <BarChart :chart-data="chartData" :options="chartOptions" />
+        <BarChart ref="barChart" :chart-data="chartData" :options="chartOptions" />
       </v-col>
     </v-row>
   </v-card>
@@ -58,7 +58,13 @@ export default {
         // Saldo Total
         const SaldoTotal = totalIngresos - TotalSalidas
         this.chartData.datasets[0].data = [SaldoTotal, totalIngresos, TotalSalidas]
-        this.chartData.labels = [ `Saldo - S/. ${SaldoTotal}`, `Ingresos - S/. ${totalIngresos}`, `Salidas - S/. ${TotalSalidas}`]
+        this.chartData.labels = [ `Total - S/. ${SaldoTotal}`, `Ingresos - S/. ${totalIngresos}`, `Salidas - S/. ${TotalSalidas}`]
+        // Forzar actualización del gráfico
+        this.$nextTick(() => {
+          if (this.$refs.barChart && typeof this.$refs.barChart.renderChart === 'function') {
+            this.$refs.barChart.renderChart(this.chartData, this.chartOptions)
+          }
+        })
       } catch (error) {
         console.log('Error al obtener los datos:', error)
       }

@@ -1,20 +1,18 @@
 <template>
   <v-card height="100%" tile>
     <v-card-title>
-      <v-row dense>
-        <v-col cols="7" md="10" class="mb-0">
-          <span class="text-h6">Compras y Pagos</span>
+      <v-row dense align="center" class="mb-2">
+        <v-col cols="12" md="8">
+          <span class="text-h6 font-weight-bold">Compras y Pagos</span>
         </v-col>
-        <v-col cols="5" md="2" class="mb-0">
-          <v-switch
-            @click="switchMode"
-            :label="model ? 'Tabla' : 'Tarjetas'"
-          ></v-switch>
-        </v-col>
-        <v-col cols="12" md="6" class="mt-0">
+        <v-col cols="12" md="4" class="d-flex align-center justify-space-between">
           <v-btn color="primary" small fab dark @click="dialogComponent = true">
             <v-icon dark>mdi-plus</v-icon>
           </v-btn>
+          <v-switch
+            @click="switchMode"
+            :label="model ? 'Tarjeta' : 'Tabla'"
+          ></v-switch>
         </v-col>
       </v-row>
     </v-card-title>
@@ -32,8 +30,8 @@
           S/.{{ item.monto }}
         </template>
         <template v-slot:[`item.estado`]="{ item }">
-          <v-chip :color="item.estado ? 'red' : 'green'" dark>
-            {{ item.estado ? 'Pendiente' : 'Cancelado' }}
+          <v-chip :color="item.estado ? 'green' : 'orange'" dark>
+            {{ item.estado ? 'Cancelado' : 'Pendiente' }}
           </v-chip>
         </template>
         <template v-slot:[`item.acciones`]="{ item }">
@@ -45,7 +43,7 @@
     <v-row v-else>
       <v-col cols="12" sm="12">
         <v-row>
-          <v-col v-for="box in boxs" :key="box.id" cols="12" sm="6" md="4">
+          <v-col v-for="box in boxs.filter(item => item.estado === false)" :key="box.id" cols="12" sm="6" md="4">
             <v-card
               @click="editCompra(box)"
               class="pa-2 mb-4" style="border: 2px solid orange; border-radius: 10px;"
