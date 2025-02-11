@@ -52,11 +52,9 @@
           </v-row>
           <v-row class="m-0">
             <v-col cols="12">
-              <div
-                class="pb-4"
-                v-for="(detail, index) in detailBox" :key="index"
-                v-touch:swipe.right="() => onSwipeRight(index)"
-                v-touch:swipe.left="() => onSwipeLeft(index)"
+              <div class="swipe-test"  v-for="(detail, index) in detailBox" :key="index"
+                v-touch:swipe.left="()=> onSwipeLeft(detail)"
+                v-touch:swipe.right="()=> onSwipeRight(detail)"
               >
                 <v-row dense>
                   <v-col cols="1" class="mr-2" align-center>
@@ -84,6 +82,19 @@
                     </v-text-field>
                   </v-col>
                 </v-row>
+                <div v-if="detail.showDelete" class="icon-delete-overlay">
+                  <v-btn icon @click="removeDetail(index)">
+                    <v-icon color="red">mdi-delete</v-icon>
+                  </v-btn>
+                  <v-chip
+                    @click="changeStatus(detail)"
+                    :color="detail.estado ? 'green' : 'orange'"
+                    text-color="white"
+                    small
+                  >
+                    {{ detail.estado ? 'Cancelado' : 'Pendiente' }}
+                  </v-chip>
+                </div>
               </div>
             </v-col>
           </v-row>
@@ -177,14 +188,16 @@ computed: {
   }
 },
 methods: {
-  onSwipeRight(index) {
-    // Mostrar el botón de eliminar para este detalle
-    this.$set(this.detailBox[index], 'showDelete', true);
-  },
-  onSwipeLeft(index) {
-    // Ocultar el botón de eliminar al hacer swipe a la izquierda
-    this.$set(this.detailBox[index], 'showDelete', false);
-  },
+  onSwipeLeft(detail) {
+      // Al deslizar a la izquierda, mostramos el botón de eliminar
+      console.log('Izquierda', detail)
+      this.$set(detail, 'showDelete', true);
+    },
+    onSwipeRight(detail) {
+      // Al deslizar a la derecha, ocultamos el botón de eliminar
+      console.log('Derecha', detail)
+      this.$set(detail, 'showDelete', false);
+    },
   changeStatus(detail){
     console.log(detail)
     detail.estado = !detail.estado
@@ -250,3 +263,10 @@ methods: {
 }
 }
 </script>
+<style scoped>
+.swipe-test {
+  background: #eee;
+  padding: 50px;
+  text-align: center;
+}
+</style>
