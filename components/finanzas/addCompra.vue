@@ -52,49 +52,55 @@
           </v-row>
           <v-row class="m-0">
             <v-col cols="12">
-              <div class="swipe-test"  v-for="(detail, index) in detailBox" :key="index"
-                v-touch:swipe.left="()=> onSwipeLeft(detail)"
-                v-touch:swipe.right="()=> onSwipeRight(detail)"
-              >
-                <v-row dense>
-                  <v-col cols="1" class="mr-2" align-center>
-                    <v-chip color="primary" small>{{ index + 1 }}</v-chip>
-                  </v-col>
-                  <v-col cols="7">
-                    <v-text-field
-                      v-model="detail.detalle"
-                      label="Detalle"
-                      dense
-                      hide-details
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="3">
-                    <v-text-field
-                      v-model="detail.monto"
-                      label="Monto"
-                      type="number"
-                      dense
-                      hide-details
-                    >
-                      <template v-slot:prepend-inner>
-                        <span class="ml-1">S/</span>
-                      </template>
-                    </v-text-field>
-                  </v-col>
-                </v-row>
-                <div v-if="detail.showDelete" class="icon-delete-overlay">
-                  <v-btn icon @click="removeDetail(index)">
-                    <v-icon color="red">mdi-delete</v-icon>
-                  </v-btn>
-                  <v-chip
-                    @click="changeStatus(detail)"
-                    :color="detail.estado ? 'green' : 'orange'"
-                    text-color="white"
-                    small
-                  >
-                    {{ detail.estado ? 'Cancelado' : 'Pendiente' }}
-                  </v-chip>
-                </div>
+              <div v-for="(detail, index) in detailBox" :key="index" class="mb-4 px-2">
+                <v-card class="pa-3" outlined>
+                  <v-row dense align="center">
+                    <v-col cols="1" class="text-center">
+                      <v-chip color="primary" small>{{ index + 1 }}</v-chip>
+                    </v-col>
+                    <v-col cols="5">
+                      <v-text-field
+                        v-model="detail.detalle"
+                        label="Detalle"
+                        dense
+                        hide-details
+                        outlined
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="3">
+                      <v-text-field
+                        v-model="detail.monto"
+                        label="Monto"
+                        type="number"
+                        dense
+                        hide-details
+                        outlined
+                      >
+                        <template v-slot:prepend-inner>
+                          <span class="ml-1">S/</span>
+                        </template>
+                      </v-text-field>
+                    </v-col>
+                    <v-col cols="3" class="d-flex justify-end align-center">
+                      <v-btn  hide-details icon @click="toggleActions(detail)">
+                        <v-icon>
+                          {{ detail.showActions ? 'mdi-chevron-left' : 'mdi-chevron-right' }}
+                        </v-icon>
+                      </v-btn>
+                      <v-btn v-if="detail.showActions" icon @click="removeDetail(index)">
+                        <v-icon color="red">mdi-delete</v-icon>
+                      </v-btn>
+                      <v-checkbox
+                        v-if="detail.showActions"
+                        v-model="detail.estado"
+                        color="success"
+                        class="ml-2 mb-2"
+                        dense
+                        hide-details
+                      ></v-checkbox>
+                    </v-col>
+                  </v-row>
+                </v-card>
               </div>
             </v-col>
           </v-row>
@@ -188,19 +194,13 @@ computed: {
   }
 },
 methods: {
-  onSwipeLeft(detail) {
-      // Al deslizar a la izquierda, mostramos el botón de eliminar
-      console.log('Izquierda', detail)
-      this.$set(detail, 'showDelete', true);
-    },
-    onSwipeRight(detail) {
-      // Al deslizar a la derecha, ocultamos el botón de eliminar
-      console.log('Derecha', detail)
-      this.$set(detail, 'showDelete', false);
-    },
-  changeStatus(detail){
-    console.log(detail)
-    detail.estado = !detail.estado
+  toggleActions(detail) {
+    // Si la propiedad no existe, la inicializamos; si existe, la alternamos
+    if (typeof detail.showActions === 'undefined') {
+      this.$set(detail, 'showActions', true);
+    } else {
+      detail.showActions = !detail.showActions;
+    }
   },
   removeDetail(index) {
     this.detailBox.splice(index, 1);
@@ -263,10 +263,3 @@ methods: {
 }
 }
 </script>
-<style scoped>
-.swipe-test {
-  background: #eee;
-  padding: 50px;
-  text-align: center;
-}
-</style>
