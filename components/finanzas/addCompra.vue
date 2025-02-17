@@ -46,58 +46,53 @@
                 color="orange"
                 text-color="white"
               >
-                {{ compra.monto ? 'Total: S/. ' + compra.monto : 'Total: S/. 0' }}
+                {{ totalDetail ? 'Total: S/. ' + totalDetail : 'Total: S/. 0' }}
               </v-chip>
             </v-col>
           </v-row>
           <v-row class="m-0">
             <v-col cols="12">
               <div v-for="(detail, index) in detailBox" :key="index" class="mb-4 px-2">
+                <v-row dense>
+                  <v-col class="d-flex justify-space-between" cols="12" md="12">
+                    {{ index + 1 }}
+                    <v-btn hide-details icon @click="toggleActions(detail)">
+                      <v-icon>
+                        {{ detail.showActions ? 'mdi-eye-closed' : 'mdi-eye' }}
+                      </v-icon>
+                    </v-btn>
+                  </v-col>
+                </v-row>
                 <v-card class="pa-3" outlined>
-                  <v-row dense align="center">
-                    <v-col cols="1" class="text-center">
-                      <v-chip color="primary" small>{{ index + 1 }}</v-chip>
+                  <v-row dense>
+                    <v-col cols="4" md="5">
+                      <span>{{ detail.detalle }}</span>
                     </v-col>
-                    <v-col cols="5">
-                      <v-text-field
-                        v-model="detail.detalle"
-                        label="Detalle"
-                        dense
-                        hide-details
-                        outlined
-                      ></v-text-field>
+                    <v-col cols="2" md="3">
+                      <span>{{ detail.monto }}</span>
                     </v-col>
-                    <v-col cols="3">
-                      <v-text-field
-                        v-model="detail.monto"
-                        label="Monto"
-                        type="number"
-                        dense
-                        hide-details
-                        outlined
-                      >
-                        <template v-slot:prepend-inner>
-                          <span class="ml-1">S/</span>
-                        </template>
-                      </v-text-field>
-                    </v-col>
-                    <v-col cols="3" class="d-flex justify-end align-center">
-                      <v-btn  hide-details icon @click="toggleActions(detail)">
-                        <v-icon>
-                          {{ detail.showActions ? 'mdi-chevron-left' : 'mdi-chevron-right' }}
-                        </v-icon>
-                      </v-btn>
-                      <v-btn v-if="detail.showActions" icon @click="removeDetail(index)">
-                        <v-icon color="red">mdi-delete</v-icon>
-                      </v-btn>
-                      <v-checkbox
-                        v-if="detail.showActions"
-                        v-model="detail.estado"
-                        color="success"
-                        class="ml-2 mb-2"
-                        dense
-                        hide-details
-                      ></v-checkbox>
+                    <v-col cols="5" md="3">
+                      <v-row v-if="detail.showActions" dense>
+                        <v-col cols="4" md="4">
+                          <v-btn icon @click="removeDetail(index)">
+                            <v-icon color="red">mdi-delete</v-icon>
+                          </v-btn>
+                        </v-col>
+                        <v-col cols="4" md="4">
+                          <v-btn icon @click="editDetail(index)">
+                            <v-icon color="primary">mdi-pencil</v-icon>
+                          </v-btn>
+                        </v-col>
+                        <v-col cols="4" md="4">
+                          <v-checkbox
+                            v-model="detail.estado"
+                            color="success"
+                            class="ml-2"
+                            dense
+                            hide-details
+                          ></v-checkbox>
+                        </v-col>
+                      </v-row>
                     </v-col>
                   </v-row>
                 </v-card>
@@ -108,7 +103,7 @@
           <v-dialog v-model="dialogDetail" max-width="400px">
             <v-card>
               <v-card-title>
-                <span class="text-h6">Añadir Detalle</span>
+                <span class="text-h6">{{ editIndex !== null ? 'Editar Detalle' : 'Agregar Detalle' }}</span>
               </v-card-title>
               <v-card-text>
                 <v-form>
@@ -129,8 +124,8 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="addDetail">
-                  Agregar
+                <v-btn color="blue darken-1" text @click="editIndex !== null ? editDetail() : addDetail()">
+                  {{ editIndex !== null ? 'Editar' : 'Agregar' }}
                 </v-btn>
                 <v-btn color="grey" text @click="dialogDetail = false">
                   Cancelar
@@ -170,7 +165,8 @@ data() {
     compra: { ...this.boxs },
     detailBox: [],
     newDetail: { detalle: '', monto: 0, estado: false }, // Para capturar datos del modal
-    dialogDetail: false // Control para abrir/cerrar el modal de detalle
+    dialogDetail: false, // Control para abrir/cerrar el modal de detalle
+    editIndex: null
   }
 },
 watch: {
@@ -191,6 +187,11 @@ watch: {
 computed: {
   formTitle() {
     return this.compra.id === null ? 'Nuevo Compra' : 'Editar Compra'
+  },
+  totalDetail() {
+    return this.detailBox.reduce((sum, detail)=>{
+      return sum + (parseFloat(detail.monto || 0 ))
+    }, 0)
   }
 },
 methods: {
@@ -204,6 +205,12 @@ methods: {
   },
   removeDetail(index) {
     this.detailBox.splice(index, 1);
+  },
+  editDetail (index) {
+    const detail =this.detailBox[index]
+    this.newDetail = { ...detail}
+    this.editIndex = index
+    this.dialogDetail = true
   },
   addDetail() {
     if (this.newDetail.detalle && this.newDetail.monto) {
@@ -263,3 +270,8 @@ methods: {
 }
 }
 </script>
+<style scoped>
+.expanded {
+  margin-left: 10px; /* Desplaza ligeramente el texto cuando se expande */
+}
+</style>
