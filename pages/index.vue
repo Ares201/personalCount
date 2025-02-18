@@ -1,12 +1,12 @@
 <template>
   <v-card height="100%" tile>
     <v-card-title>
-      <span class="text-h6">Movimiento de Efectivo</span>
+      <!-- <span class="text-h6">Movimiento de Efectivo</span> -->
       <v-spacer />
     </v-card-title>
     <v-row>
       <v-col cols="12" md="6">
-        <BarChart ref="barChart" :chart-data="chartData" :options="chartOptions" />
+        <!-- <BarChart ref="barChart" :chart-data="chartData" :options="chartOptions" /> -->
       </v-col>
     </v-row>
   </v-card>

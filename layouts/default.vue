@@ -132,39 +132,53 @@ export default {
         {
           icon: 'mdi-apps',
           title: 'Welcome',
-          to: '/'
+          // to: '/'
         },
+        // {
+        //   icon: 'mdi-account',
+        //   title: 'Configuracion',
+        //   children: [
+        //     {
+        //       title: 'Usuarios',
+        //       to: '/mantenimiento/usuarios'
+        //     }
+        //   ]
+        // },
+        // {
+        //   icon: 'mdi-cash',
+        //   title: 'Finanzas',
+        //   children: [
+        //     {
+        //       title: 'Ingresos',
+        //       to: '/finanzas/ingresos'
+        //     },
+        //     {
+        //       title: 'Salidas',
+        //       to: '/finanzas/salidas'
+        //     }
+        //   ]
+        // },
+        // {
+        //   icon: 'mdi-basket',
+        //   title: 'Compras',
+        //   children: [
+        //     {
+        //       title: 'Compras',
+        //       to: '/compras/compras'
+        //     }
+        //   ]
+        // },
         {
-          icon: 'mdi-account',
-          title: 'Configuracion',
+          icon: '',
+          title: 'Saturno',
           children: [
             {
-              title: 'Usuarios',
-              to: '/mantenimiento/usuarios'
-            }
-          ]
-        },
-        {
-          icon: 'mdi-cash',
-          title: 'Finanzas',
-          children: [
-            {
-              title: 'Ingresos',
-              to: '/finanzas/ingresos'
+              title: 'Dashboard',
+              to:'/saturno/dashboard'
             },
             {
-              title: 'Salidas',
-              to: '/finanzas/salidas'
-            }
-          ]
-        },
-        {
-          icon: 'mdi-basket',
-          title: 'Compras',
-          children: [
-            {
-              title: 'Compras',
-              to: '/compras/compras'
+              title: 'FlashReport',
+              to:'/saturno/flashreport'
             }
           ]
         }
