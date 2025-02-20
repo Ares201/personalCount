@@ -6,7 +6,7 @@
     </v-card-title>
     <v-row>
       <v-col cols="12" class="d-flex justify-center align-center">
-        <span>Filtros: Por fecha , por operacion , por estado, por usuario</span>
+        <span>Filtros: Por fecha , por operacion , por estado, por usuario, por EVENTO</span>
       </v-col>
     </v-row>
     <v-row>
@@ -49,7 +49,16 @@ export default {
           {
             label: 'Cantidad de Documentos',
             data: [],
-            backgroundColor: ['#8ce709', '#f44336', '#2196f3', '#ff9800', '#673ab7']
+            backgroundColor: [
+              '#8ce709',
+              '#f44336',
+              '#2196f3',
+              '#ff9800',
+              '#673ab7',
+              '#ffeb3b',
+              '#00bcd4',
+              '#4caf50'
+            ]
           }
         ]
       },

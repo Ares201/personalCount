@@ -1,21 +1,21 @@
 <template>
   <v-card height="100%" tile>
     <v-card-title>
-      <v-row>
+      <v-row dense>
         <v-col cols="12" class="d-flex justify-space-between align-center">
           <span class="text-h6">Documento F-R</span>
-          <v-btn color="primary" small fab dark @click="openDialog">
+          <v-btn color="primary" small fab dark @click="dialogComponent = true">
             <v-icon dark>mdi-plus</v-icon>
           </v-btn>
         </v-col>
         <v-col cols="12" md="4">
-          <v-autocomplete
+          <v-text-field
+            v-model="searchQuery"
             color="green"
-            hide-no-data
-            hide-selected
-            label="Buscar Evento"
-            prepend-icon="mdi-database-search"
-          ></v-autocomplete>
+            label="Buscar N° Flash Report"
+            prepend-icon="mdi-magnify"
+            clearable
+          ></v-text-field>
         </v-col>
         <v-col cols="12" md="4">
           <v-autocomplete
@@ -38,6 +38,25 @@
             :items="['CONDESTABLE', 'CEMENTO CL', 'CERRO LINDO', 'ATACOCHA', 'CATALINA HUANCA']"
             v-model="selectedOperacion"
           ></v-autocomplete>
+        </v-col>
+      </v-row>
+      <v-row dense>
+        <v-col cols="12" md="4">
+          <v-text-field
+            v-model="fechaFiltro"
+            label="Filtrar por fecha de envío"
+            prepend-icon="mdi-calendar"
+            type="date"
+            outlined
+            dense
+          ></v-text-field>
+        </v-col>
+        <v-spacer></v-spacer>
+        <v-col cols="12" md="4" class="d-flex justify-end">
+          <v-btn color="green" dark @click="exportExcel">
+            <v-icon left>mdi-microsoft-excel</v-icon>
+            Exportar a Excel
+          </v-btn>
         </v-col>
       </v-row>
     </v-card-title>
@@ -77,7 +96,7 @@
 
 <script>
 import addDocument from '../../components/addFlashR.vue';
-import { getDocuments, deleteDocument } from '../../services/documentServices';
+import { getDocuments, deleteDocument, updateDocument, assignIdsToDocuments } from '../../services/documentServices';
 
 export default {
   name: 'Documents',
@@ -87,12 +106,12 @@ export default {
       headers: [
         { text: '#', value: 'index', sortable: false },
         { text: 'Fecha de Envío', value: 'fechaEnvio' },
-        { text: 'Fecha de Repuesta', value: 'fechaRepuesta' },
         { text: 'N° Flash Report', value: 'numero' },
         { text: 'Operación', value: 'operacion' },
         { text: 'Evento', value: 'evento' },
-        // { text: 'Fecha Solicitud', value: 'fechaSolicitud' },
+        // { text: 'Fecha de Repuesta', value: 'fechaRepuesta' },
         { text: 'Operador CC', value: 'operador' },
+        // { text: 'Fecha Solicitud', value: 'fechaSolicitud' },
         // { text: 'Link', value: 'link' },
         { text: 'Estado', value: 'estado' },
         { text: 'Acciones', value: 'acciones', sortable: false }
@@ -102,6 +121,8 @@ export default {
       selectedEstado: null,
       selectedOperacion: null,
       selectedDocument: null,
+      searchQuery: null,
+      fechaFiltro: this.getFechaHoy()
     };
   },
   computed: {
@@ -109,14 +130,23 @@ export default {
       return this.documents.filter(doc => {
         const estadoMatch = !this.selectedEstado || doc.estado === this.selectedEstado;
         const operacionMatch = !this.selectedOperacion || doc.operacion === this.selectedOperacion;
-        return estadoMatch && operacionMatch;
+        const searchMatch = !this.searchQuery || doc.numero.toString().includes(this.searchQuery);
+        const fechaMatch = !this.fechaFiltro || doc.fechaEnvio === this.fechaFiltro;
+        return estadoMatch && operacionMatch && searchMatch && fechaMatch;
       });
     }
   },
-  async created() {
+  async beforeMount() {
     await this.fetchDocuments();
   },
   methods: {
+    exportExcel(){
+      alert('Se esta trabajando...')
+    },
+    getFechaHoy() {
+      const hoy = new Date();
+      return hoy.toISOString().split("T")[0]; // Formato YYYY-MM-DD
+    },
     async fetchDocuments() {
       try {
         const allDocuments = await getDocuments();
@@ -129,6 +159,7 @@ export default {
       console.log('Editar', document)
       this.selectedDocument = { ...document };
       this.dialogComponent = true;
+      this.fetchDocuments();
     },
     async deleteDocument(id) {
       console.log('pasa el id', id)
@@ -147,10 +178,6 @@ export default {
         color = 'primary'
       }
       return color
-    },
-    openDialog() {
-      this.selectedDocument = null;
-      this.dialogComponent = true;
     },
     closeDialog() {
       this.dialogComponent = false;

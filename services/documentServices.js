@@ -5,8 +5,9 @@ const documentsCollection = collection(db, 'documents')
 
 // Crear un document
 export const createDocument = async (document) => {
-  return await addDoc(documentsCollection, document)
-}
+  const docRef = await addDoc(documentsCollection, document);
+  return { id: docRef.id, ...document }; // Retorna el documento con su nuevo ID
+};
 
 // Obtener todos los documents
 export const getDocuments = async () => {

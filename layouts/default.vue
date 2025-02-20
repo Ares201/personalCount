@@ -169,7 +169,7 @@ export default {
         //   ]
         // },
         {
-          icon: '',
+          icon: 'mdi-tools',
           title: 'Saturno',
           children: [
             {

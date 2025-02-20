@@ -1,9 +1,10 @@
 <template>
-  <v-dialog v-model="dialog" max-width="600px">
+  <v-dialog v-model="dialog" max-width="800px">
     <v-card>
-      <v-card-title>
+      <v-card-title class="justify-center mb-2">
         <span class="text-h6">{{ formTitle }}</span>
       </v-card-title>
+      <v-divider class="mb-4"></v-divider>
       <v-card-text>
         <v-form ref="form">
           <v-container>
@@ -19,7 +20,7 @@
               </v-col>
               <v-col cols="12" md="6">
                 <v-select
-                  :items="['CONDESTABLE', 'CEMENTO CL', 'CERRO LINDO', 'ATACOCHA', 'CATALINA HUANCA', 'EN BASE']"
+                  :items="['CONDESTABLE', 'CEMENTO CL', 'ECOSERM CL', 'CERRO LINDO', 'ATACOCHA', 'CATALINA HUANCA', 'EN BASE']"
                   label="Operación"
                   v-model="document.operacion"
                   outlined
@@ -46,9 +47,25 @@
                 dense
               />
               </v-col>
+              <v-col v-if="document.fechaRepuesta" cols="12" md="6">
+                <v-select
+                  :items="['En Proceso', 'Completado', 'No Solicitado']"
+                  label="Estado"
+                  v-model="document.estado"
+                  outlined
+                  required
+                  dense
+                />
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" md="12">
+                <label style="color: black;">Detalle del Documento</label>
+                <v-divider></v-divider>
+              </v-col>
               <v-col cols="12" md="6">
                 <v-text-field
-                label="Fecha Solicitud"
+                label="Fecha Solicitud de Requerimientos"
                 v-model="document.fechaSolicitud"
                 outlined
                 required
@@ -84,23 +101,15 @@
                 required
                 dense />
               </v-col>
-              <v-col cols="12" md="6">
-                <v-select
-                  :items="['Pendiente', 'En Proceso', 'Completado', 'No Solicitado']"
-                  label="Estado"
-                  v-model="document.estado"
-                  outlined
-                  required
-                  dense
-                />
-              </v-col>
             </v-row>
           </v-container>
         </v-form>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="saveDocument" :loading="loading">Guardar</v-btn>
+        <v-btn color="blue darken-1" text @click="saveDocument" :loading="loading">
+          {{ this.document.id === null ? 'Guardar' : 'Editar' }}
+        </v-btn>
         <v-btn color="grey" text @click="close">Cancelar</v-btn>
       </v-card-actions>
     </v-card>
@@ -144,7 +153,7 @@ export default {
         if (this.document.id) {
           await updateDocument(this.document.id, { ...this.document })
         } else {
-          await createDocument({ ...this.document })
+          await createDocument({ ...this.document, estado: 'Pendiente' })
         }
         this.$emit('saveDocument')
         this.close()
