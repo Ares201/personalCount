@@ -5,9 +5,9 @@ const documentsCollection = collection(db, 'documents')
 
 // Crear un document
 export const createDocument = async (document) => {
-  const docRef = await addDoc(documentsCollection, document);
-  return { id: docRef.id, ...document }; // Retorna el documento con su nuevo ID
-};
+  return await addDoc(documentsCollection, document)
+}
+
 
 // Obtener todos los documents
 export const getDocuments = async () => {
@@ -16,10 +16,21 @@ export const getDocuments = async () => {
 }
 
 // Actualizar un document
+// export const updateDocument = async (id, updatedFields) => {
+//   const documentDoc = doc(db, 'documents', id)
+//   return await updateDoc(documentDoc, updatedFields)
+// }
+// Actualizar un documento en Firebase evitando valores undefined
 export const updateDocument = async (id, updatedFields) => {
-  const documentDoc = doc(db, 'documents', id)
-  return await updateDoc(documentDoc, updatedFields)
-}
+  const documentDoc = doc(db, 'documents', id);
+
+  // Limpiar undefined y reemplazar por null
+  const cleanFields = Object.fromEntries(
+    Object.entries(updatedFields).map(([key, value]) => [key, value ?? null])
+  );
+
+  return await updateDoc(documentDoc, cleanFields);
+};
 
 // Eliminar un document
 export const deleteDocument = async (id) => {

@@ -4,7 +4,7 @@
       <v-row dense>
         <v-col cols="12" class="d-flex justify-space-between align-center">
           <span class="text-h6">Documento F-R</span>
-          <v-btn color="primary" small fab dark @click="dialogComponent = true">
+          <v-btn color="primary" small fab dark @click="openNewDocument">
             <v-icon dark>mdi-plus</v-icon>
           </v-btn>
         </v-col>
@@ -86,7 +86,7 @@
       </v-data-table>
     </v-card-text>
     <addDocument
-      :dialog.sync="dialogComponent"
+      :dialog ="dialogComponent"
       @closedialog="closeDialog"
       @saveDocument="fetchDocuments"
       :documents="selectedDocument"
@@ -95,12 +95,15 @@
 </template>
 
 <script>
+import Swal from "sweetalert2";
 import addDocument from '../../components/addFlashR.vue';
-import { getDocuments, deleteDocument, updateDocument, assignIdsToDocuments } from '../../services/documentServices';
+import { getDocuments, deleteDocument } from '../../services/documentServices';
 
 export default {
   name: 'Documents',
-  components: { addDocument },
+  components: {
+    addDocument
+  },
   data() {
     return {
       headers: [
@@ -140,6 +143,24 @@ export default {
     await this.fetchDocuments();
   },
   methods: {
+    openNewDocument() {
+      this.selectedDocument = {
+        id: null,
+        numero: '',
+        operacion: '',
+        evento: '',
+        placaTracto: '',
+        placaCarreta:'',
+        ubicacion: '',
+        fechaEnvio: '',
+        fechaRepuesta: '',
+        fechaSolicitud: '',
+        operador: '',
+        link: '',
+        estado: ''
+      }
+      this.dialogComponent = true
+    },
     exportExcel(){
       alert('Se esta trabajando...')
     },
@@ -159,12 +180,30 @@ export default {
       console.log('Editar', document)
       this.selectedDocument = { ...document };
       this.dialogComponent = true;
-      this.fetchDocuments();
     },
     async deleteDocument(id) {
-      console.log('pasa el id', id)
-      await deleteDocument(id);
-      this.fetchDocuments();
+      const confirm = await Swal.fire({
+        title: "¿Estás seguro que deseas eliminar?",
+        text: "Esta acción no se puede deshacer.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar"
+      });
+
+      if (confirm.isConfirmed) {
+        try {
+          console.log("Eliminando documento con ID:", id);
+          await deleteDocument(id);
+          await this.fetchDocuments();
+          Swal.fire("Eliminado", "El documento ha sido eliminado.", "success");
+        } catch (error) {
+          console.error("Error al eliminar documento:", error);
+          Swal.fire("Error", "No se pudo eliminar el documento.", "error");
+        }
+      }
     },
     returnEstado(item) {
       let color = 'default' // Valor por defecto
