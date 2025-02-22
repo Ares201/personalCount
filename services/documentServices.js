@@ -8,7 +8,6 @@ export const createDocument = async (document) => {
   return await addDoc(documentsCollection, document)
 }
 
-
 // Obtener todos los documents
 export const getDocuments = async () => {
   const snapshot = await getDocs(documentsCollection)
@@ -23,12 +22,10 @@ export const getDocuments = async () => {
 // Actualizar un documento en Firebase evitando valores undefined
 export const updateDocument = async (id, updatedFields) => {
   const documentDoc = doc(db, 'documents', id);
-
   // Limpiar undefined y reemplazar por null
   const cleanFields = Object.fromEntries(
     Object.entries(updatedFields).map(([key, value]) => [key, value ?? null])
   );
-
   return await updateDoc(documentDoc, cleanFields);
 };
 

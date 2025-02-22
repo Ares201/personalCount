@@ -171,7 +171,7 @@ export default {
     async fetchDocuments() {
       try {
         const allDocuments = await getDocuments();
-        this.documents = allDocuments
+        this.documents = allDocuments.sort((a, b) => new Date(b.numero) - new Date(a.numero));
       } catch (error) {
         console.error('Error al obtener documentos:', error);
       }
