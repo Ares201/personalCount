@@ -206,7 +206,7 @@ export default {
           await updateDocument(this.document.id, {
             numero: this.document.numero,
             operacion: this.document.operacion,
-            evento: this.document.operacion,
+            evento: this.document.evento,
             fechaEnvio: this.document.fechaEnvio,
             ubicacion: this.document.ubicacion,
             placaTracto: this.document.placaTracto,
@@ -221,7 +221,7 @@ export default {
           await createDocument({
             numero: this.document.numero,
             operacion: this.document.operacion,
-            evento: this.document.operacion,
+            evento: this.document.evento,
             fechaEnvio: this.document.fechaEnvio,
             ubicacion: this.document.ubicacion,
             placaTracto: this.document.placaTracto,

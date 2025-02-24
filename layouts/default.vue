@@ -179,6 +179,10 @@ export default {
             {
               title: 'FlashReport',
               to:'/saturno/flashreport'
+            },
+            {
+              title:'Eventos',
+              to:'/saturno/eventos'
             }
           ]
         }
