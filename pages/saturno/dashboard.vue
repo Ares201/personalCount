@@ -36,6 +36,7 @@ import BarChart from '../../components/chart/Barchart'
 import { getDocuments } from '../../services/documentServices'
 
 export default {
+  middleware: 'auth',
   components: {
     BarChart
   },

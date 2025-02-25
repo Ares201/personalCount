@@ -123,6 +123,7 @@ export default {
     switchMode
   },
   name: 'DefaultLayout',
+  middleware: 'auth',
   data () {
     return {
       clipped: false,

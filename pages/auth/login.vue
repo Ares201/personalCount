@@ -53,6 +53,9 @@ export default {
     }
   },
   methods: {
+    goToRegister(){
+      console.log('Resgistrate')
+    },
     async login() {
       try {
         const usuarios = await getUsers()

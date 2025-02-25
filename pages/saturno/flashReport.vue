@@ -101,6 +101,7 @@ import { getDocuments, deleteDocument } from '../../services/documentServices';
 
 export default {
   name: 'Documents',
+  middleware: 'auth',
   components: {
     addDocument
   },

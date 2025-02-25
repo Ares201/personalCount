@@ -84,7 +84,7 @@
              <v-row dense>
                 <v-col cols="12">
                   <v-card-text class="event-details">
-                    <h3 class="mb-6">CENTRO CONTROL INFORMA</h3>
+                    <h3 class="mb-6"> 📢 CENTRO CONTROL INFORMA</h3>
                     <v-btn color="primary" @click="copyToClipboard(event)">📋 Copiar</v-btn>
                     <div><strong>Evento:</strong> {{ event.evento }}</div>
                     <div><strong>Nivel:</strong> {{ event.nivel }}</div>
@@ -121,6 +121,7 @@ import { getEvents, deleteEvent } from '../../services/eventServices';
 
 export default {
   name: 'Events',
+  middleware: 'auth',
   components: {
     addEvent
   },
