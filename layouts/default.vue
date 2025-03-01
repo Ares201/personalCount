@@ -160,7 +160,7 @@ export default {
       },
       {
         icon: 'mdi-basket',
-        title: 'Compras',
+        title: 'Tareas y Compras',
         children: [
           { title: 'Compras', to: '/compras/compras' }
         ]

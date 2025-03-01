@@ -53,37 +53,35 @@
           <v-row class="m-0">
             <v-col cols="12">
               <div v-for="(detail, index) in detailBox" :key="index" class="mb-4 px-2">
-                <v-row dense>
-                  <v-col class="d-flex justify-space-between" cols="12" md="12">
-                    {{ index + 1 }}
-                    <v-btn hide-details icon @click="toggleActions(detail)">
-                      <v-icon>
-                        {{ detail.showActions ? 'mdi-eye-closed' : 'mdi-eye' }}
-                      </v-icon>
-                    </v-btn>
-                  </v-col>
-                </v-row>
                 <v-card class="pa-3" outlined>
                   <v-row dense>
+                    {{ index + 1 }}.-
                     <v-col cols="4" md="5">
                       <span>{{ detail.detalle }}</span>
                     </v-col>
-                    <v-col cols="2" md="3">
-                      <span>{{ detail.monto }}</span>
+                    <v-col cols="3" md="3">
+                      <span>S/.{{ detail.monto }}</span>
                     </v-col>
                     <v-col cols="5" md="3">
-                      <v-row v-if="detail.showActions" dense>
-                        <v-col cols="4" md="4">
+                      <v-row dense>
+                        <v-col cols="3" md="3" v-if="detail.showActions">
                           <v-btn icon @click="removeDetail(index)">
                             <v-icon color="red">mdi-delete</v-icon>
                           </v-btn>
                         </v-col>
-                        <v-col cols="4" md="4">
+                        <v-col cols="3" md="3" v-if="detail.showActions">
                           <v-btn icon @click="editDetail(index)">
                             <v-icon color="primary">mdi-pencil</v-icon>
                           </v-btn>
                         </v-col>
-                        <v-col cols="4" md="4">
+                        <v-col cols="3" md="3">
+                          <v-btn hide-details icon @click="toggleActions(detail)">
+                            <v-icon>
+                              {{ detail.showActions ? 'mdi-eye-closed' : 'mdi-eye' }}
+                            </v-icon>
+                          </v-btn>
+                        </v-col>
+                        <v-col cols="3" md="3">
                           <v-checkbox
                             v-model="detail.estado"
                             color="success"

@@ -21,6 +21,11 @@
           S/.{{ item.monto }}
         </template>
         <template v-slot:[`item.acciones`]="{ item }">
+          <v-chip
+            v-if="item.categoria === 'Prestamo'"
+            :color="returnEstado(item)"
+            @click="changeType(item)"> {{ item.tipo === "Salida" ? 'Ingresar a ahorros' : 'Pagado' }}
+          </v-chip>
           <v-icon small color="blue" @click="editSalida(item)">mdi-pencil</v-icon>
           <v-icon small color="red" @click="deleteSalida(item.id)">mdi-delete</v-icon>
         </template>
@@ -36,7 +41,8 @@
   </v-card>
 </template>
 <script>
-import { getBoxs, deleteBox } from '../../services/boxServices';
+import Swal from "sweetalert2";
+import { getBoxs, deleteBox, updateBox } from '../../services/boxServices';
 import addSalida from '../../components/finanzas/addSalida.vue';
 export default {
   name: 'Salidas',
@@ -63,6 +69,40 @@ export default {
     await this.fetchSalidas()
   },
   methods: {
+    async changeType(item) {
+      const confirm = await Swal.fire({
+        title: "¿Estás seguro que deseas ingresar Ahorros?",
+        text: "Excelente estas Pagando una deuda de tus ahorros.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Sí, ingresar",
+        cancelButtonText: "Cancelar"
+      });
+      if (confirm.isConfirmed) {
+        try {
+          await updateBox(item.id, {
+            tipo: 'Ingreso'
+          });
+          item.tipo = 'Ingreso'
+          await this.fetchSalidas()
+          Swal.fire("Movido", "El registro ha sido Movido.", "success");
+        } catch (error) {
+          console.error("Error al eliminar registro:", error);
+          Swal.fire("Error", "No se pudo Mover el registro.", "error");
+        }
+      }
+    },
+    returnEstado(item) {
+      let color = 'default' // Valor por defecto
+      if (item.tipo === "Salida") {
+        color = 'orange'
+      } else if (item.tipo === "Ingreso") {
+        color = 'success'
+      }
+      return color
+    },
     async fetchSalidas(){
       try {
         const allBoxs = await getBoxs()
@@ -75,9 +115,28 @@ export default {
       this.selectedSalida = {...salida}
       this.dialogComponent = true
     },
-    async deleteSalida(id){
-      await deleteBox(id)
-      this.fetchSalidas()
+    async deleteSalida(id) {
+      const confirm = await Swal.fire({
+        title: "¿Estás seguro que deseas eliminar?",
+        text: "Esta acción no se puede deshacer.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar"
+      });
+
+      if (confirm.isConfirmed) {
+        try {
+          await deleteBox(id)
+          await this.fetchSalidas()
+          Swal.fire("Eliminado", "El registro ha sido eliminado.", "success");
+        } catch (error) {
+          console.error("Error al eliminar registro:", error);
+          Swal.fire("Error", "No se pudo eliminar el registro.", "error");
+        }
+      }
     },
     openDialog(){
       this.dialogComponent = true

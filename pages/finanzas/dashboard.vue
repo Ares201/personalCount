@@ -1,7 +1,7 @@
 <template>
   <v-card height="100%" tile>
     <v-card-title>
-      <span class="text-h6">Movimiento de Efectivo</span>
+      <span class="text-h6">Movimiento de Ahorros</span>
       <v-spacer />
     </v-card-title>
     <v-row>
