@@ -61,7 +61,7 @@ export default {
         const usuarios = await getUsers()
         console.log('Usuarios cargados:', usuarios)
         const user = usuarios.find(
-          (u) => u.email === this.username && u.password === this.password
+          (usuario) => usuario.email === this.username && usuario.password === this.password
         )
         if (user) {
           console.log('Usuario encontrado:', user)

@@ -9,7 +9,7 @@
     >
       <v-list>
         <v-list-item
-          v-for="(item, i) in items"
+          v-for="(item, i) in filteredItems"
           :key="i"
           :to="item.to"
           router
@@ -118,6 +118,7 @@
 
 <script>
 import switchMode from '../components/colorMode.vue';
+import {  getUsers } from '~/services/userServices'
 export default {
   components: {
     switchMode
@@ -125,80 +126,86 @@ export default {
   name: 'DefaultLayout',
   middleware: 'auth',
   data () {
-    return {
-      clipped: false,
-      drawer: false,
-      fixed: false,
-      items: [
-        {
-          icon: 'mdi-apps',
-          title: 'Welcome',
-          // to: '/'
-        },
-        // {
-        //   icon: 'mdi-account',
-        //   title: 'Configuracion',
-        //   children: [
-        //     {
-        //       title: 'Usuarios',
-        //       to: '/mantenimiento/usuarios'
-        //     }
-        //   ]
-        // },
-        // {
-        //   icon: 'mdi-cash',
-        //   title: 'Finanzas',
-        //   children: [
-        //     {
-        //       title: 'Ingresos',
-        //       to: '/finanzas/ingresos'
-        //     },
-        //     {
-        //       title: 'Salidas',
-        //       to: '/finanzas/salidas'
-        //     }
-        //   ]
-        // },
-        // {
-        //   icon: 'mdi-basket',
-        //   title: 'Compras',
-        //   children: [
-        //     {
-        //       title: 'Compras',
-        //       to: '/compras/compras'
-        //     }
-        //   ]
-        // },
-        {
-          icon: 'mdi-tools',
-          title: 'Saturno',
-          children: [
-            {
-              title: 'Dashboard',
-              to:'/saturno/dashboard'
-            },
-            {
-              title: 'FlashReport',
-              to:'/saturno/flashreport'
-            },
-            {
-              title:'Eventos',
-              to:'/saturno/eventos'
-            }
-          ]
-        }
-      ],
-      miniVariant: false,
-      right: true,
-      rightDrawer: false,
-      title: 'ARES'
+  return {
+    clipped: false,
+    drawer: false,
+    fixed: false,
+    miniVariant: false,
+    right: true,
+    rightDrawer: false,
+    user: JSON.parse(localStorage.getItem('user')) || {},
+    title: 'ARES',
+    items: [
+      {
+        icon: 'mdi-apps',
+        title: 'Welcome',
+        to: '/'
+      },
+      {
+        icon: 'mdi-account',
+        title: 'Configuracion',
+        children: [
+          { title: 'Usuarios', to: '/mantenimiento/usuarios' },
+          { title: 'Permisos', to: '/mantenimiento/permisos' }
+        ]
+      },
+      {
+        icon: 'mdi-cash',
+        title: 'Finanzas',
+        children: [
+          { title: 'Dashboard', to: '/finanzas/dashboard'},
+          { title: 'Ingresos', to: '/finanzas/ingresos' },
+          { title: 'Salidas', to: '/finanzas/salidas' }
+        ]
+      },
+      {
+        icon: 'mdi-basket',
+        title: 'Compras',
+        children: [
+          { title: 'Compras', to: '/compras/compras' }
+        ]
+      },
+      {
+        icon: 'mdi-tools',
+        title: 'Saturno',
+        children: [
+          { title: 'Dashboard', to:'/saturno/dashboard' },
+          { title: 'FlashReport', to:'/saturno/flashreport' },
+          { title:'Eventos', to:'/saturno/eventos' }
+        ]
+      }
+    ]
+  }
+},
+computed: {
+  filteredItems() {
+      if (this.user.role === 'Administrador') {
+        return this.items; // Mostrar todos los ítems
+      } else {
+        return this.items
+          .map(section => ({
+            ...section,
+            children: section.children
+              ? section.children.filter(child => this.user.permissions.includes(child.to))
+              : []
+          }))
+          .filter(section => section.children.length > 0 || !section.children);
+      }
     }
   },
   methods: {
     async logout() {
       localStorage.removeItem('user')
-      this.$router.push({ path: '/auth/login' })
-    }
+      await this.$router.push({ path: '/auth/login' })
+      window.location.reload()
+    },
+    async fetchUsers() {
+      try {
+        this.usuarios = await getUsers()
+      } catch (error) {
+        console.error('Error al obtener Registros.', error)
+      }
+    },
   }
 }
 </script>

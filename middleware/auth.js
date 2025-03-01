@@ -8,7 +8,6 @@ export default function ({ redirect }) {
 
   if (!user) {
     console.log('No hay usuario, redirigiendo...')
-    // return redirect('https://personalcount-85a4a.web.app/auth/login')
-    return redirect('http://localhost:3000/auth/login')
+    return redirect('https://personalcount-85a4a.web.app/auth/login')
   }
 }
