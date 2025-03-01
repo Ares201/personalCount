@@ -133,7 +133,7 @@ export default {
     miniVariant: false,
     right: true,
     rightDrawer: false,
-    user: JSON.parse(localStorage.getItem('user')) || {},
+    user: { role: '', permissions: [] },
     title: 'ARES',
     items: [
       {
@@ -193,10 +193,16 @@ computed: {
       }
     }
   },
+  mounted() {
+    // Acceder a localStorage solo en el cliente
+    if (process.client) {
+      this.user = JSON.parse(localStorage.getItem('user')) || {};
+    }
+  },
   methods: {
     async logout() {
-      localStorage.removeItem('user')
       await this.$router.push({ path: '/auth/login' })
+      localStorage.removeItem('user')
       window.location.reload()
     },
     async fetchUsers() {

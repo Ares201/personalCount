@@ -49,10 +49,15 @@ export default {
       selectedUser: null,
       permissions: [],
       availableRoutes: [
+        // Mantenimiento
         "/mantenimiento/usuarios",
+        // Finanzas
+        "/finanzas/dashboard",
         "/finanzas/ingresos",
         "/finanzas/salidas",
+        // Compras
         "/compras/compras",
+        // Saturno
         "/saturno/dashboard",
         "/saturno/flashreport",
         "/saturno/eventos"
