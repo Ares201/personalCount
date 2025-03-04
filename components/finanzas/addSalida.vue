@@ -25,6 +25,7 @@
           v-model="salida.categoria"
           outlined
           required
+          clearable
         />
         <v-text-field
           v-model="salida.descripcion"

@@ -32,6 +32,7 @@
             label="Rol"
             outlined
             required
+            clearable
           />
         </v-form>
       </v-card-text>

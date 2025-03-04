@@ -25,6 +25,7 @@
           label="Categoria"
           outlined
           required
+          clearable
         />
         <v-text-field
           v-model="ingreso.descripcion"

@@ -58,11 +58,11 @@
                 </v-col>
                 <v-col cols="6">
                   <v-label>Estado:</v-label>
-                  <v-select :items="['Cargado', 'Vacío']" v-model="event.estado" outlined dense hide-details />
+                  <v-select :items="['Cargado', 'Vacío']" v-model="event.estado" outlined dense hide-details clearable />
                 </v-col>
                 <v-col cols="6">
                   <v-label>Cámaras:</v-label>
-                  <v-select :items="['Si Cuenta', 'No Cuenta']" v-model="event.camaras" outlined dense hide-details />
+                  <v-select :items="['Si Cuenta', 'No Cuenta']" v-model="event.camaras" outlined dense hide-details clearable />
                 </v-col>
                 <v-col cols="6">
                   <v-label>Operador:</v-label>
@@ -76,6 +76,7 @@
                     outlined
                     dense
                     hide-details
+                    clearable
                   />
                 </v-col>
                 <v-col cols="6">

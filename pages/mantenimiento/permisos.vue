@@ -10,6 +10,7 @@
         item-text="name"
         label="Selecciona un usuario"
         @change="fetchPermissions"
+        clearable
       />
       <v-container v-if="selectedUser">
         <v-row>
@@ -51,6 +52,7 @@ export default {
       availableRoutes: [
         // Mantenimiento
         "/mantenimiento/usuarios",
+        "/mantenimiento/empleados",
         // Finanzas
         "/finanzas/dashboard",
         "/finanzas/ingresos",

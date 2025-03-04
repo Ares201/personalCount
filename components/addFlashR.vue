@@ -32,6 +32,7 @@
                   v-model="document.operacion"
                   outlined
                   dense
+                  clearable
                 />
               </v-col>
               <v-col cols="6" md="3">
@@ -67,6 +68,29 @@
                   dense
                 />
               </v-col>
+              <v-col cols="12" md="6">
+                <v-autocomplete
+                  :items="employees"
+                  label="Empleado"
+                  v-model="document.employee"
+                  outlined
+                  dense
+                  clearable
+                  item-text="name"
+                  item-value="id"
+                  return-object
+                >
+                  <template #append-item>
+                    <v-divider />
+                    <v-list-item link @click="OpenDialogEmployee()" class="fixed-option">
+                        <a>
+                          + Empleado
+                        </a>
+                      </v-list-item>
+                    <v-divider />
+                  </template>
+                </v-autocomplete>
+              </v-col>
               <v-col v-if="document.fechaRepuesta" cols="12" md="6">
                 <v-select
                   :items="['En Proceso', 'Completado', 'No Solicitado']"
@@ -74,6 +98,7 @@
                   v-model="document.estado"
                   outlined
                   dense
+                  clearable
                 />
               </v-col>
             </v-row>
@@ -107,6 +132,7 @@
                   v-model="document.operador"
                   outlined
                   dense
+                  clearable
                 />
               </v-col>
               <v-col v-if="document.fechaRepuesta" cols="12" md="6">
@@ -127,14 +153,26 @@
         </v-btn>
         <v-btn color="grey" text @click="close">Cancelar</v-btn>
       </v-card-actions>
+      <!-- addEmployee -->
+        <add-employee
+          :dialog="dialogEmployee"
+          @closedialog="closedialogEmployee"
+          @saveEmployee="saveEmployees"
+        />
     </v-card>
   </v-dialog>
 </template>
 <script>
+import Swal from 'sweetalert2'
 import { createDocument, updateDocument } from '../services/documentServices';
+import { getEmployees } from '../services/employeeServices';
+import addEmployee from '../components/configuracion/addEmployee';
 
 export default {
   name: 'addDocument',
+  components: {
+    addEmployee
+  },
   props: {
     dialog: { type: Boolean, default: false },
     documents: {
@@ -152,14 +190,22 @@ export default {
         fechaSolicitud: '',
         operador: '',
         link: '',
-        estado: ''
+        estado: '',
+        employee: null
       })
     }
   },
   data() {
     return {
       loading: false,
-      document: { ...this.documents }
+      document: { ...this.documents },
+      employees : [],
+      dialogEmployee: false,
+      currentEmployee: {  // Added property
+        name: '',
+        workstation: '',
+        area: ''
+      },
     }
   },
   watch: {
@@ -180,7 +226,8 @@ export default {
             fechaSolicitud: '',
             operador: '',
             link: '',
-            estado: ''
+            estado: '',
+            employee: ''
           }
         }
       },
@@ -197,6 +244,9 @@ export default {
     formTitle() {
       return this.document.id === null ? 'Nuevo Documento' : 'Editar Documento'
     }
+  },
+  beforeMount() {
+    this.getEmployees()
   },
   methods: {
     async saveDocument() {
@@ -215,7 +265,8 @@ export default {
             fechaSolicitud: this.document.fechaSolicitud,
             operador: this.document.operador,
             link: this.document.link,
-            estado: this.document.estado
+            estado: this.document.estado,
+            employee: this.document.employee
           })
         } else {
           await createDocument({
@@ -230,7 +281,8 @@ export default {
             fechaSolicitud: this.document.fechaSolicitud,
             operador: this.document.operador,
             link: this.document.link,
-            estado: 'Pendiente'
+            estado: 'Pendiente',
+            employee: this.document.employee
           })
         }
         this.$emit('saveDocument')
@@ -239,6 +291,30 @@ export default {
       } catch (error) {
         console.error('Error al guardar documento:', error)
       }
+    },
+    OpenDialogEmployee(){
+      console.log(this.dialogEmployee)
+      this.dialogEmployee = true
+    },
+    async getEmployees() {
+      try {
+        this.employees = await getEmployees()
+        console.log(this.employees)
+      } catch (error) {
+        console.error('Error al obtener empleados:', error)
+      }
+    },
+    saveEmployees() {
+      Swal.fire({
+        icon: 'success',
+        title: 'Empleado guardado con éxito',
+        showConfirmButton: false,
+        timer: 1500
+      })
+    },
+    closedialogEmployee() {
+      this.dialogEmployee = false;
+      this.getEmployees()
     },
     close() {
       this.$emit('closedialog')
@@ -255,7 +331,8 @@ export default {
         fechaSolicitud: '',
         operador: '',
         link: '',
-        estado: ''
+        estado: '',
+        employee: ''
       }
     },
   }

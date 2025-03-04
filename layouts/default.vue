@@ -146,7 +146,8 @@ export default {
         title: 'Configuracion',
         children: [
           { title: 'Usuarios', to: '/mantenimiento/usuarios' },
-          { title: 'Permisos', to: '/mantenimiento/permisos' }
+          { title: 'Permisos', to: '/mantenimiento/permisos' },
+          { title: 'Empleados', to: '/mantenimiento/empleados' }
         ]
       },
       {
