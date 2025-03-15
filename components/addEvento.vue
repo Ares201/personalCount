@@ -64,9 +64,28 @@
                   <v-label>Cámaras:</v-label>
                   <v-select :items="['Si Cuenta', 'No Cuenta']" v-model="event.camaras" outlined dense hide-details clearable />
                 </v-col>
-                <v-col cols="6">
-                  <v-label>Operador:</v-label>
-                  <v-text-field v-model="event.operador" outlined dense hide-details />
+                <v-col cols="12" md="6">
+                  <v-autocomplete
+                    :items="employees"
+                    label="Empleado"
+                    v-model="event.employee"
+                    outlined
+                    dense
+                    clearable
+                    item-text="name"
+                    item-value="id"
+                    return-object
+                  >
+                    <template #append-item>
+                      <v-divider />
+                      <v-list-item link @click="OpenDialogEmployee()" class="fixed-option">
+                          <a>
+                            + Empleado
+                          </a>
+                        </v-list-item>
+                      <v-divider />
+                    </template>
+                  </v-autocomplete>
                 </v-col>
                 <v-col cols="6">
                   <v-label>Contrato:</v-label>
@@ -99,14 +118,26 @@
         </v-btn>
         <v-btn color="grey" text @click="close">Cancelar</v-btn>
       </v-card-actions>
+       <!-- addEmployee -->
+       <add-employee
+          :dialog="dialogEmployee"
+          @closedialog="closedialogEmployee"
+          @saveEmployee="saveEmployees"
+        />
     </v-card>
   </v-dialog>
 </template>
 <script>
 import { createEvent, updateEvent } from '../services/eventServices';
+import { getEmployees } from '../services/employeeServices';
+import addEmployee from '../components/configuracion/addEmployee';
+
 
 export default {
   name: 'addEvent',
+  components: {
+    addEmployee
+  },
   props: {
     dialog: { type: Boolean, default: false },
     events: {
@@ -121,7 +152,7 @@ export default {
         hora: '',
         estado: '',
         camaras: '',
-        operador: '',
+        employee: '',
         contrato: '',
         ubicacion: '',
         detalle: ''
@@ -131,7 +162,9 @@ export default {
   data() {
     return {
       loading: false,
-      event: { ...this.events }
+      event: { ...this.events },
+      employees : [],
+      dialogEmployee: false,
     }
   },
   watch: {
@@ -148,7 +181,7 @@ export default {
             hora: '',
             estado: '',
             camaras: '',
-            operador: '',
+            employee: '',
             contrato: '',
             ubicacion: '',
             detalle: ''
@@ -169,6 +202,9 @@ export default {
       return this.event.id === null ? 'Nuevo Evento' : 'Editar Evento'
     }
   },
+  beforeMount() {
+    this.getEmployees()
+  },
   methods: {
     async saveEvent() {
       try {
@@ -182,7 +218,7 @@ export default {
             hora: this.event.hora,
             estado: this.event.estado,
             camaras: this.event.camaras,
-            operador: this.event.operador,
+            employee: this.event.employee,
             contrato: this.event.contrato,
             ubicacion: this.event.ubicacion,
             detalle: this.event.detalle
@@ -196,7 +232,7 @@ export default {
             hora: this.event.hora,
             estado: this.event.estado,
             camaras: this.event.camaras,
-            operador: this.event.operador,
+            employee: this.event.employee,
             contrato: this.event.contrato,
             ubicacion: this.event.ubicacion,
             detalle: this.event.detalle
@@ -209,6 +245,18 @@ export default {
         console.error('Error al guardar evento:', error)
       }
     },
+    async getEmployees() {
+      try {
+        this.employees = await getEmployees()
+        console.log(this.employees)
+      } catch (error) {
+        console.error('Error al obtener empleados:', error)
+      }
+    },
+    closedialogEmployee() {
+      this.dialogEmployee = false;
+      this.getEmployees()
+    },
     close() {
       this.$emit('closedialog')
       this.event = {
@@ -220,7 +268,7 @@ export default {
         hora: '',
         estado: '',
         camaras: '',
-        operador: '',
+        employee: '',
         contrato: '',
         ubicacion: '',
         detalle: ''

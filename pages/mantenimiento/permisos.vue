@@ -62,7 +62,8 @@ export default {
         // Saturno
         "/saturno/dashboard",
         "/saturno/flashreport",
-        "/saturno/eventos"
+        "/saturno/eventos",
+        "/saturno/horasLaborales",
       ]
     };
   },

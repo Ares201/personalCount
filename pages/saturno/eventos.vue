@@ -85,7 +85,6 @@
                 <v-col cols="12">
                   <v-card-text class="event-details">
                     <h3 class="mb-6"> 📢 CENTRO CONTROL INFORMA</h3>
-                    <v-btn color="primary" @click="copyToClipboard(event)">📋 Copiar</v-btn>
                     <div><strong>Evento:</strong> {{ event.evento }}</div>
                     <div><strong>Nivel:</strong> {{ event.nivel }}</div>
                     <div><strong>Placa:</strong> {{ event.placa }}</div>
@@ -97,6 +96,8 @@
                     <div><strong>Contrato:</strong> {{ event.contrato }}</div>
                     <div><strong>Ubicación:</strong> {{ event.ubicacion }}</div>
                     <div><strong>Detalles:</strong> {{ event.detalle }}</div>
+                    <v-btn color="primary" @click="copyToClipboard(event)">📋 Copiar</v-btn>
+                    <v-btn color="success" @click="copyToClipboard(event)"> Realizar Flash Rª</v-btn>
                   </v-card-text>
                 </v-col>
               </v-row>

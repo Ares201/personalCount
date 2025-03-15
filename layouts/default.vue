@@ -171,8 +171,9 @@ export default {
         title: 'Saturno',
         children: [
           { title: 'Dashboard', to:'/saturno/dashboard' },
+          { title:'Horas Laborales', to:'/saturno/horasLaborales' },
           { title: 'FlashReport', to:'/saturno/flashreport' },
-          { title:'Eventos', to:'/saturno/eventos' }
+          { title:'Eventos', to:'/saturno/eventos' },
         ]
       }
     ]
