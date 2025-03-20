@@ -15,14 +15,18 @@
         <v-text-field
           label="Puesto de Trabajo"
           v-model="currentEmployee.workstation"
-          type="Puesto de Trabajo"
           outlined
           required
         ></v-text-field>
         <v-text-field
           label="Area"
           v-model="currentEmployee.area"
-          type="area"
+          outlined
+          required
+        ></v-text-field>
+        <v-text-field
+          label="Horas de Trabajo"
+          v-model="currentEmployee.workHours"
           outlined
           required
         ></v-text-field>
@@ -42,7 +46,7 @@ export default {
 name: 'addEmployee',
 props: {
   dialog: { type: Boolean, default: false },
-  employee: { type: Object, default: () => ({ id: null, name: '', workstation: '', area: '' }) }  // Empleado a editar
+  employee: { type: Object, default: () => ({ id: null, name: '', workstation: '', area: '', workHours: '' }) }  // Empleado a editar
 },
 data() {
   return {
@@ -70,12 +74,14 @@ methods: {
           name: this.currentEmployee.name,
           workstation: this.currentEmployee.workstation,
           area: this.currentEmployee.area,
+          workHours: this.currentEmployee.workHours,
         })
       } else {
         await createEmployee({
           name: this.currentEmployee.name,
           workstation: this.currentEmployee.workstation,
           area: this.currentEmployee.area,
+          workHours: this.currentEmployee.workHours,
         })
       }
       this.$emit('saveEmployee')
@@ -91,6 +97,7 @@ methods: {
       name: '',
       workstation: '',
       area: '',
+      workHours: '',
     }
   },
 }

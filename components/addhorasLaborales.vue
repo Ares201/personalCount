@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" max-width="800px">
+  <v-dialog v-model="dialog" max-width="500px">
     <v-card>
       <v-card-title class="justify-center mb-2">
         <span class="text-h6">{{ formTitle }}</span>
@@ -9,66 +9,30 @@
         <v-form ref="form">
           <v-container>
             <v-row dense>
-              <v-col cols="12" md="3">
+              <v-col cols="12" md="12">
                 <v-text-field
-                  label="N° Flash Report"
-                  v-model="hwork.numero"
-                  outlined
-                  dense
-                />
-              </v-col>
-              <v-col cols="12" md="9">
-                <v-text-field
-                  label="Evento"
-                  v-model="hwork.evento"
-                  outlined
-                  dense
-                />
-              </v-col>
-              <v-col cols="12" md="6">
-                <v-select
-                  :items="['CONDESTABLE', 'CEMENTO CL', 'ECOSERM CL', 'CERRO LINDO', 'ATACOCHA', 'CATALINA HUANCA', 'EN BASE']"
-                  label="Operación"
-                  v-model="hwork.operacion"
-                  outlined
-                  dense
-                  clearable
-                />
-              </v-col>
-              <v-col cols="6" md="3">
-                <v-text-field
-                  label="Ubicacion"
-                  v-model="hwork.ubicacion"
-                  outlined
-                  dense
-                />
-              </v-col>
-              <v-col cols="12" md="3">
-                <v-text-field
-                  label="Fecha de Envío"
-                  v-model="hwork.fechaEnvio"
-                  outlined
+                  label="Fecha"
+                  v-model="hwork.date"
                   type="date"
                   dense
                 />
               </v-col>
-              <v-col cols="6" md="3">
+              <v-switch
+                @click="switchMode"
+                :label="model ? 'Ahora' : 'Ingresar'"
+              ></v-switch>
+              <v-col cols="12" md="12" class="d-flex justify-center">
+                <v-chip v-if="!model" class="mx-4 mt-2 text-h6" color="blue darken-2" label>
+                  {{ currentTime }}
+                </v-chip>
                 <v-text-field
-                  label="Placa Tracto"
-                  v-model="hwork.placaTracto"
-                  outlined
+                  v-else
+                  class="mx-4 text-h6"
+                  v-model="hwork.startTime"
+                  outlined type="time"
                   dense
+                  hide-details
                 />
-              </v-col>
-              <v-col cols="6" md="3">
-                <v-text-field
-                  label="Placa Carreta"
-                  v-model="hwork.placaCarreta"
-                  outlined
-                  dense
-                />
-              </v-col>
-              <v-col cols="12" md="6">
                 <v-autocomplete
                   :items="employees"
                   label="Empleado"
@@ -79,6 +43,7 @@
                   item-text="name"
                   item-value="id"
                   return-object
+                  class="custom-autocomplete"
                 >
                   <template #append-item>
                     <v-divider />
@@ -91,56 +56,13 @@
                   </template>
                 </v-autocomplete>
               </v-col>
-              <v-col v-if="hwork.fechaRepuesta" cols="12" md="6">
-                <v-select
-                  :items="['En Proceso', 'Completado', 'No Solicitado']"
-                  label="Estado"
-                  v-model="hwork.estado"
-                  outlined
-                  dense
-                  clearable
-                />
-              </v-col>
-            </v-row>
-            <v-row>
               <v-col cols="12" md="12">
-                <label style="color: black;">Detalle del Hworko</label>
-                <v-divider></v-divider>
-              </v-col>
-              <v-col cols="12" md="6">
-                <v-text-field
-                label="Fecha Solicitud de Requerimientos"
-                v-model="hwork.fechaSolicitud"
-                outlined
-                type="date"
-                dense
-              />
-              </v-col>
-              <v-col cols="12" md="6">
-                <v-text-field
-                  label="Fecha de Respuesta"
-                  v-model="hwork.fechaRepuesta"
-                  outlined
-                  type="date"
-                  dense
-                />
-              </v-col>
-              <v-col v-if="hwork.fechaRepuesta" cols="12" md="6">
-                <v-select
-                  :items="['Giancarlo Cervera', 'Paolo Limaco', 'Jair Macazana', 'Ronal Zevallos', 'Victor Pinto']"
-                  label="Operador CC"
-                  v-model="hwork.operador"
-                  outlined
-                  dense
-                  clearable
-                />
-              </v-col>
-              <v-col v-if="hwork.fechaRepuesta" cols="12" md="6">
-                <v-text-field
-                label="Link"
-                v-model="hwork.link"
-                outlined
-                dense />
+                <v-sheet class="pa-2 rounded-lg border-radio">
+                  <v-radio-group v-model="hwork.status" row>
+                    <v-radio label="Ingreso" value="income"></v-radio>
+                    <v-radio label="Salida" value="out"></v-radio>
+                  </v-radio-group>
+                </v-sheet>
               </v-col>
             </v-row>
           </v-container>
@@ -164,6 +86,7 @@
 </template>
 <script>
 import Swal from 'sweetalert2'
+import { Timestamp } from "firebase/firestore";
 import { createHwork, updateHwork } from '../services/hworkServices';
 import { getEmployees } from '../services/employeeServices';
 import addEmployee from '../components/configuracion/addEmployee';
@@ -179,25 +102,17 @@ export default {
       type: Object,
       default: () => ({
         id: null,
-        numero: '',
-        operacion: '',
-        evento: '',
-        placaTracto: '',
-        placaCarreta:'',
-        ubicacion: '',
-        fechaEnvio: '',
-        fechaRepuesta: '',
-        fechaSolicitud: '',
-        operador: '',
-        link: '',
-        estado: '',
-        employee: null
+        startTime: '',
+        employee: null,
+        status:'',
       })
     }
   },
   data() {
     return {
+      currentTime: '',
       loading: false,
+      model: false,
       hwork: { ...this.hworks },
       employees : [],
       dialogEmployee: false,
@@ -215,19 +130,9 @@ export default {
           this.hwork = this.hworks.id ? { ...this.hworks } :
           {
             id: null,
-            numero: '',
-            operacion: '',
-            evento: '',
-            placaTracto: '',
-            placaCarreta:'',
-            ubicacion: '',
-            fechaEnvio: '',
-            fechaRepuesta: '',
-            fechaSolicitud: '',
-            operador: '',
-            link: '',
-            estado: '',
-            employee: ''
+            startTime: '',
+            employee: null,
+            status:'',
           }
         }
       },
@@ -242,54 +147,49 @@ export default {
   },
   computed: {
     formTitle() {
-      return this.hwork.id === null ? 'Nuevo Hworko' : 'Editar Hworko'
+      return this.hwork.id === null ? 'Nueva Asistencia' : 'Editar Asistencia'
     }
+  },
+  mounted() {
+    this.updateTime();
+    setInterval(this.updateTime, 1000); // Se actualiza cada segundo
   },
   beforeMount() {
     this.getEmployees()
   },
   methods: {
+    switchMode(){
+      this.model = !this.model
+    },
     async saveHwork() {
       try {
-        this.loading= true
+        this.loading = true;
+        if (this.hwork.startTime) {
+          const [hours, minutes] = this.hwork.startTime.split(":").map(Number);
+          const startDate = new Date();
+          startDate.setHours(hours, minutes, 0, 0);
+          this.hwork.startTime = Timestamp.fromDate(startDate);
+        }
         if (this.hwork.id) {
           await updateHwork(this.hwork.id, {
-            numero: this.hwork.numero,
-            operacion: this.hwork.operacion,
-            evento: this.hwork.evento,
-            fechaEnvio: this.hwork.fechaEnvio,
-            ubicacion: this.hwork.ubicacion,
-            placaTracto: this.hwork.placaTracto,
-            placaCarreta:this.hwork.placaCarreta,
-            fechaRepuesta: this.hwork.fechaRepuesta,
-            fechaSolicitud: this.hwork.fechaSolicitud,
-            operador: this.hwork.operador,
-            link: this.hwork.link,
-            estado: this.hwork.estado,
+            startTime: this.hwork.startTime,
+            date: this.hwork.date,
+            status: this.hwork.status,
             employee: this.hwork.employee
-          })
+          });
         } else {
           await createHwork({
-            numero: this.hwork.numero,
-            operacion: this.hwork.operacion,
-            evento: this.hwork.evento,
-            fechaEnvio: this.hwork.fechaEnvio,
-            ubicacion: this.hwork.ubicacion,
-            placaTracto: this.hwork.placaTracto,
-            placaCarreta:this.hwork.placaCarreta,
-            fechaRepuesta: this.hwork.fechaRepuesta,
-            fechaSolicitud: this.hwork.fechaSolicitud,
-            operador: this.hwork.operador,
-            link: this.hwork.link,
-            estado: 'Pendiente',
+            startTime: this.hwork.startTime,
+            date: this.hwork.date,
+            status: this.hwork.status,
             employee: this.hwork.employee
-          })
+          });
         }
-        this.$emit('saveHwork')
-        this.close()
-        this.loading= false
+        this.$emit("saveHwork");
+        this.close();
+        this.loading = false;
       } catch (error) {
-        console.error('Error al guardar hworko:', error)
+        console.error("Error al guardar hwork:", error);
       }
     },
     OpenDialogEmployee(){
@@ -316,25 +216,34 @@ export default {
       this.dialogEmployee = false;
       this.getEmployees()
     },
+    updateTime() {
+      this.currentTime = new Date().toLocaleTimeString('es-PE', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      });
+    },
     close() {
       this.$emit('closedialog')
       this.hwork = {
         id: null,
-        numero: '',
-        operacion: '',
-        evento: '',
-        placaTracto: '',
-        placaCarreta:'',
-        ubicacion: '',
-        fechaEnvio: '',
-        fechaRepuesta: '',
-        fechaSolicitud: '',
-        operador: '',
-        link: '',
-        estado: '',
+        status: '',
         employee: ''
       }
     },
   }
 }
 </script>
+<style scoped>
+.custom-autocomplete ::v-deep(.v-input__control) {
+  border-radius: 10px;
+}
+.border-radio {
+  border: 2px solid #90a4ae;
+  background-color: #eceff1;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+</style>

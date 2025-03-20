@@ -14,7 +14,7 @@ export const getHworks = async () => {
   return snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
 }
 
-// Actualizar un hwork
+// Actualizar un hwork  
 // export const updateHwork = async (id, updatedFields) => {
 //   const hworkDoc = doc(db, 'hworks', id)
 //   return await updateDoc(hworkDoc, updatedFields)

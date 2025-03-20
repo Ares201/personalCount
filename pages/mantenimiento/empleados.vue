@@ -46,6 +46,7 @@ export default {
         { text: 'Nombre', value: 'name', sortable: false },
         { text: 'Puesto de Trabajo', value: 'workstation', sortable: false },
         { text: 'Area', value: 'area', sortable: false },
+        { text: 'Horas de Trabajo', value: 'workHours', sortable: false },
         { text: 'Acciones', value: 'acciones', sortable: false }
       ],
       empleados: [],
