@@ -10,40 +10,85 @@
           <v-container>
             <v-row dense>
               <v-col cols="12" md="12">
+                <v-menu
+                  v-model="menuFecha"
+                  :close-on-content-click="false"
+                  transition="scale-transition"
+                  offset-y
+                  min-width="auto"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="hwork.date"
+                      label="Fecha"
+                      append-icon="mdi-calendar"
+                      :color="secondaryColor"
+                      v-bind="attrs"
+                      v-on="on"
+                      readonly
+                      clearable
+                      outlined
+                      dense
+                      hide-details
+                    />
+                  </template>
+                  <v-date-picker :color="secondaryColor" v-model="hwork.date" @input="menuFecha = false"></v-date-picker>
+                </v-menu>
+              </v-col>
+              <v-col cols="12" md="12">
+                <v-autocomplete
+                  v-model="hwork.operationMina"
+                  :color="secondaryColor"
+                  :items="['CONDESTABLE', 'CEMENTO CL', 'CERRO LINDO', 'NEXA PASCO', 'CATALINA HUANCA']"
+                  append-icon="mdi-mine"
+                  label="Operacion"
+                  class="mt-2"
+                  clearable
+                  outlined
+                  dense
+                  hide-no-data
+                  hide-selected
+                  hide-details
+                ></v-autocomplete>
+              </v-col>
+              <!-- <v-col cols="12" md="12">
                 <v-text-field
                   label="Fecha"
                   v-model="hwork.date"
                   type="date"
                   dense
                 />
-              </v-col>
+              </v-col> -->
               <v-switch
                 @click="switchMode"
                 :label="model ? 'Ahora' : 'Ingresar'"
+                :color="secondaryColor"
               ></v-switch>
               <v-col cols="12" md="12" class="d-flex justify-center">
-                <v-chip v-if="!model" class="mx-4 mt-2 text-h6" color="blue darken-2" label>
+                <v-chip v-if="!model" class="mx-4 mt-1 text-h6" :color="secondaryColor" outlined label>
                   {{ currentTime }}
                 </v-chip>
                 <v-text-field
                   v-else
                   class="mx-4 text-h6"
                   v-model="hwork.startTime"
+                  :color="secondaryColor"
                   outlined type="time"
                   dense
                   hide-details
                 />
                 <v-autocomplete
                   :items="employees"
-                  label="Empleado"
+                  :color="secondaryColor"
                   v-model="hwork.employee"
-                  outlined
-                  dense
-                  clearable
+                  class="custom-autocomplete"
+                  label="Empleado"
                   item-text="name"
                   item-value="id"
                   return-object
-                  class="custom-autocomplete"
+                  outlined
+                  dense
+                  clearable
                 >
                   <template #append-item>
                     <v-divider />
@@ -59,8 +104,8 @@
               <v-col cols="12" md="12">
                 <v-sheet class="pa-2 rounded-lg border-radio">
                   <v-radio-group v-model="hwork.status" row>
-                    <v-radio label="Ingreso" value="income"></v-radio>
-                    <v-radio label="Salida" value="out"></v-radio>
+                    <v-radio :color="secondaryColor" label="Ingreso" value="income"></v-radio>
+                    <v-radio :color="primaryColor" label="Salida" value="out"></v-radio>
                   </v-radio-group>
                 </v-sheet>
               </v-col>
@@ -70,10 +115,10 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="saveHwork" :loading="loading">
+        <v-btn :color="primaryColor" text @click="saveHwork" :loading="loading">
           {{ this.hwork.id === null ? 'Guardar' : 'Editar' }}
         </v-btn>
-        <v-btn color="grey" text @click="close">Cancelar</v-btn>
+        <v-btn :color="neutralColor" text @click="close">Cancelar</v-btn>
       </v-card-actions>
       <!-- addEmployee -->
         <add-employee
@@ -87,9 +132,9 @@
 <script>
 import Swal from 'sweetalert2'
 import { Timestamp } from "firebase/firestore";
-import { createHwork, updateHwork } from '../services/hworkServices';
-import { getEmployees } from '../services/employeeServices';
-import addEmployee from '../components/configuracion/addEmployee';
+import { createHwork, updateHwork } from '../../services/hworkServices';
+import { getEmployees } from '../../services/employeeServices';
+import addEmployee from '../../components/configuracion/addEmployee';
 
 export default {
   name: 'addHwork',
@@ -105,22 +150,27 @@ export default {
         startTime: '',
         employee: null,
         status:'',
+        operationMina: ''
       })
     }
   },
   data() {
     return {
-      currentTime: '',
-      loading: false,
-      model: false,
-      hwork: { ...this.hworks },
       employees : [],
-      dialogEmployee: false,
-      currentEmployee: {  // Added property
+      hwork: { ...this.hworks },
+      currentEmployee: {
         name: '',
         workstation: '',
         area: ''
       },
+      dialogEmployee: false,
+      menuFecha: false,
+      loading: false,
+      model: false,
+      currentTime: '',
+      primaryColor: '#FF8F00',
+      secondaryColor: '#2E7D32',
+      neutralColor: "#546E7A",
     }
   },
   watch: {
@@ -133,6 +183,7 @@ export default {
             startTime: '',
             employee: null,
             status:'',
+            operationMina: ''
           }
         }
       },
@@ -175,14 +226,16 @@ export default {
             startTime: this.hwork.startTime,
             date: this.hwork.date,
             status: this.hwork.status,
-            employee: this.hwork.employee
+            employee: this.hwork.employee,
+            operationMina: this.hwork.operationMina
           });
         } else {
           await createHwork({
             startTime: this.hwork.startTime,
             date: this.hwork.date,
             status: this.hwork.status,
-            employee: this.hwork.employee
+            employee: this.hwork.employee,
+            operationMina: this.hwork.operationMina
           });
         }
         this.$emit("saveHwork");
@@ -229,7 +282,8 @@ export default {
       this.hwork = {
         id: null,
         status: '',
-        employee: ''
+        employee: '',
+        operationMina:''
       }
     },
   }

@@ -4,64 +4,107 @@
       <v-row dense>
         <v-col cols="12" class="d-flex justify-space-between align-center">
           <span class="text-h6">
-            <v-icon color="primary" class="mr-3">mdi-clock-time-eight-outline</v-icon>
-            Horas Laborales
+            <v-icon :color="primaryColor" class="mr-3">mdi-clock-time-eight-outline</v-icon>
+            HORAS LABORALES
           </span>
-          <v-btn color="primary" small fab dark @click="openNewHwork">
+          <v-btn :color="primaryColor" small fab dark @click="openNewHwork">
             <v-icon dark>mdi-plus</v-icon>
           </v-btn>
         </v-col>
         <v-col cols="12" md="4">
           <v-text-field
             v-model="searchQuery"
-            color="green"
-            label="Buscar N° Flash Report"
-            prepend-icon="mdi-magnify"
+            :color="secondaryColor"
+            label="Buscar Empleado"
+            append-icon="mdi-magnify"
+            class="mt-2"
             clearable
-          ></v-text-field>
+            outlined
+            dense
+            hide-details
+          />
         </v-col>
         <v-col cols="12" md="4">
           <v-autocomplete
-            color="green"
+            v-model="selectedEstado"
+            :color="secondaryColor"
+            :items="['income', 'out']"
+            label="Ingreso"
+            append-icon="mdi-filter-outline"
+            class="mt-2"
+            clearable
+            outlined
+            dense
             hide-no-data
             hide-selected
-            label="Estado"
-            prepend-icon="mdi-information-outline"
-            :items="['Dentro del Lìmite', 'Excedìo Horas', 'Horas Optimas', 'Turno Extendido', 'Sobretiempo Critico']"
-            v-model="selectedEstado"
+            hide-details
           ></v-autocomplete>
         </v-col>
         <v-col cols="12" md="4">
           <v-autocomplete
-            color="green"
+            v-model="selectedOperacion"
+            :color="secondaryColor"
+            :items="['CONDESTABLE', 'CEMENTO CL', 'CERRO LINDO', 'ATACOCHA', 'CATALINA HUANCA']"
+            append-icon="mdi-mine"
+            label="Operacion"
+            class="mt-2"
+            clearable
+            outlined
+            dense
             hide-no-data
             hide-selected
-            label="Operacion"
-            prepend-icon="mdi-cog-outline"
-            :items="['CONDESTABLE', 'CEMENTO CL', 'CERRO LINDO', 'ATACOCHA', 'CATALINA HUANCA']"
-            v-model="selectedOperacion"
+            hide-details
           ></v-autocomplete>
         </v-col>
       </v-row>
       <v-row dense>
         <v-col cols="12" md="4">
+          <v-menu
+            v-model="menuFecha"
+            :close-on-content-click="false"
+            transition="scale-transition"
+            offset-y
+            min-width="auto"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="fechaFiltro"
+                label="Fecha"
+                append-icon="mdi-calendar"
+                :color="secondaryColor"
+                v-bind="attrs"
+                v-on="on"
+                readonly
+                clearable
+                outlined
+                dense
+                hide-details
+              ></v-text-field>
+            </template>
+            <v-date-picker :color="secondaryColor" v-model="fechaFiltro" @input="menuFecha = false"></v-date-picker>
+          </v-menu>
+        </v-col>
+        <!-- <v-col cols="12" md="4">
           <v-text-field
             v-model="fechaFiltro"
-            label="Filtrar por fecha de envío"
-            prepend-icon="mdi-calendar"
+            :color="secondaryColor"
+            label="Fecha"
             type="date"
+            clearable
             outlined
             dense
           ></v-text-field>
-        </v-col>
+        </v-col> -->
       </v-row>
     </v-card-title>
     <v-card-text>
       <v-data-table
         :headers="headers"
         :items="filteredHworks"
+        :search="searchQuery"
+        :items-per-page="10"
+        class="elevation-1"
         item-value="id"
-        dense
       >
         <template v-slot:[`item.index`]="{ index }">
           {{ index + 1 }}
@@ -88,8 +131,8 @@
           </v-chip>
         </template>
         <template v-slot:[`item.acciones`]="{ item }">
-          <v-icon small color="blue" @click="editHwork(item)">mdi-pencil</v-icon>
-          <v-icon small color="red" @click="deleteHwork(item.id)">mdi-delete</v-icon>
+          <v-icon small :color="secondaryColor" class="mr-2" @click="editHwork(item)">mdi-pencil</v-icon>
+          <v-icon small :color="dangerColor" @click="deleteHwork(item.id)">mdi-delete</v-icon>
         </template>
       </v-data-table>
     </v-card-text>
@@ -104,7 +147,7 @@
 
 <script>
 import Swal from "sweetalert2";
-import addHwork from '../../components/addhorasLaborales.vue';
+import addHwork from '../../components/saturno/addhorasLaborales.vue';
 import { Timestamp } from "firebase/firestore";
 import { listenToHworks, deleteHwork, updateHwork } from '../../services/hworkServices';
 
@@ -118,6 +161,7 @@ export default {
     return {
       headers: [
         { text: '#', value: 'index', sortable: false, align: 'center' },
+        { text: 'Operacion-Mina', value: 'operationMina', align: 'center' },
         { text: 'Conductor', value: 'employee.name', align: 'center' },
         { text: 'Jornada', value: 'employee.workHours', align: 'center' },
         { text: 'Hora de inicio', value: 'startTime', align: 'center' },
@@ -126,21 +170,26 @@ export default {
         { text: 'Tiempo de transcurrido', value: 'elapsedTime', align: 'center' },
         { text: 'Acciones', value: 'acciones', sortable: false, align: 'center' }
       ],
-      dialogComponent: false,
       hworks: [],
-      selectedEstado: null,
       selectedOperacion: null,
+      selectedEstado: null,
       selectedHwork: null,
-      searchQuery: null,
-      fechaFiltro: this.getFechaHoy()
+      dialogComponent: false,
+      menuFecha: false,
+      fechaFiltro: this.getFechaHoy(),
+      searchQuery: '',
+      primaryColor: '#FF8F00',
+      secondaryColor: '#2E7D32',
+      neutralColor: "#546E7A",
+      dangerColor: '#E53945'
     };
   },
   computed: {
     filteredHworks() {
       return this.hworks.filter(doc => {
         const statusMatch = !this.selectedEstado || doc.status === this.selectedEstado;
-        const operationMatch = !this.selectedOperacion || doc.operation === this.selectedOperacion;
-        const searchMatch = !this.searchQuery || doc.numero.toString().includes(this.searchQuery);
+        const operationMatch = !this.selectedOperacion || doc.operationMina === this.selectedOperacion;
+        const searchMatch = !this.searchQuery || doc.employee.name.toString().includes(this.searchQuery);
         const fechaMatch = !this.fechaFiltro || doc.date === this.fechaFiltro;
         return statusMatch && operationMatch && searchMatch && fechaMatch;
       });
