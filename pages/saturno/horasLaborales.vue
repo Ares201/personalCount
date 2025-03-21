@@ -3,7 +3,10 @@
     <v-card-title>
       <v-row dense>
         <v-col cols="12" class="d-flex justify-space-between align-center">
-          <span class="text-h6"><v-icon class="mr-3">mdi-clock-time-eight-outline</v-icon>Horas Laborales</span>
+          <span class="text-h6">
+            <v-icon color="primary" class="mr-3">mdi-clock-time-eight-outline</v-icon>
+            Horas Laborales
+          </span>
           <v-btn color="primary" small fab dark @click="openNewHwork">
             <v-icon dark>mdi-plus</v-icon>
           </v-btn>
@@ -69,13 +72,20 @@
         <template v-slot:[`item.endTime`]="{ item }">
           {{ formatTime(item.endTime) }}
         </template>
-        <template>
-          <v-chip class="mx-4 mt-2 text-h6" color="blue darken-2" label>
-            {{ currentTime }}
+        <template v-slot:[`item.elapsedTime`]="{ item }">
+          <v-chip class="mx-4" color="#D3E9F7" text-color="#03416E" label>
+            {{ item.elapsedTime || getElapsedTime(item) }}
           </v-chip>
         </template>
         <template v-slot:[`item.status`]="{ item }">
-          <v-chip @click="statusClose(item)" :color="returnEstado(item)" text-color="white" class="ma-1">{{ item.status === 'income' ? 'Ingreso' : 'Salida' }}</v-chip>
+          <v-chip
+            @click="statusClose(item)"
+            :color="returnEstado(item).color"
+            :text-color="returnEstado(item).text"
+            class="ma-1"
+          >
+            {{ item.status === 'income' ? 'Ingreso' : 'Salida' }}
+          </v-chip>
         </template>
         <template v-slot:[`item.acciones`]="{ item }">
           <v-icon small color="blue" @click="editHwork(item)">mdi-pencil</v-icon>
@@ -96,7 +106,7 @@
 import Swal from "sweetalert2";
 import addHwork from '../../components/addhorasLaborales.vue';
 import { Timestamp } from "firebase/firestore";
-import { getHworks, deleteHwork, updateHwork } from '../../services/hworkServices';
+import { listenToHworks, deleteHwork, updateHwork } from '../../services/hworkServices';
 
 export default {
   name: 'Hworks',
@@ -137,32 +147,58 @@ export default {
     }
   },
   mounted() {
-    this.updateTime();
-    setInterval(this.updateTime, 1000);
+    this.listenToHworks();
   },
-  async beforeMount() {
-    await this.fetchHworks();
+  beforeDestroy() {
+    // Detener los intervalos individuales
+    this.filteredHworks.forEach(item => {
+      this.stopElapsedTimeTimer(item);
+    });
   },
   methods: {
-    getElapsedTime(startTime) {
-      console.log('funcion', startTime)
-      if (!startTime) return "00:00:00"
-      const start = startTime.toDate() // Convertir Firestore Timestamp a Date
-      const now = new Date()
-      const elapsedMs = now - start; // Diferencia en milisegundos
-      const hours = Math.floor(elapsedMs / (1000 * 60 * 60))
-      const minutes = Math.floor((elapsedMs % (1000 * 60 * 60)) / (1000 * 60))
-      const seconds = Math.floor((elapsedMs % (1000 * 60)) / 1000)
-      return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
-    },
-    updateTime() {
-      this.currentTime = new Date().toLocaleTimeString('es-PE', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
+    listenToHworks() {
+      listenToHworks((hworks) => {
+        this.hworks = hworks.sort((a, b) => new Date(b.numero) - new Date(a.numero));
+
+        // Iniciar el intervalo para los nuevos elementos
+        this.hworks.forEach(item => {
+          if (!item.endTime) {
+            this.startElapsedTimeTimer(item);
+          }
+        });
       });
     },
+    startElapsedTimeTimer(item) {
+      if (!item.endTime) {
+        // Limpiar el intervalo anterior si existe
+        if (item.intervalId) {
+          clearInterval(item.intervalId);
+        }
+
+        // Iniciar un nuevo intervalo
+        item.intervalId = setInterval(() => {
+          // Forzar la reactividad de Vue
+          this.$set(item, 'elapsedTime', this.getElapsedTime(item));
+        }, 1000); // Actualizar cada segundo
+      }
+    },
+    stopElapsedTimeTimer(item) {
+      if (item.intervalId) {
+        clearInterval(item.intervalId);
+        item.intervalId = null; // Limpiar la referencia
+      }
+    },
+    getElapsedTime(item) {
+      if (!item.startTime) return "00:00:00";
+      const start = item.startTime.toDate();
+      const now = new Date();
+      const elapsedMs = now - start; // Diferencia en milisegundos
+      const hours = Math.floor(elapsedMs / (1000 * 60 * 60));
+      const minutes = Math.floor((elapsedMs % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((elapsedMs % (1000 * 60)) / 1000);
+      return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    },
+    // ... (otros métodos)
     openNewHwork() {
       this.selectedHwork = {
         id: null,
@@ -180,10 +216,23 @@ export default {
     },
     async fetchHworks() {
       try {
-        const allHworks = await getHworks();
-        this.hworks = allHworks.sort((a, b) => new Date(b.numero) - new Date(a.numero));
+        // const hworksRef = firebase.firestore().collection('hworks');
+        hworksRef.onSnapshot((snapshot) => {
+          const allHworks = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            data.id = doc.id; // Asegurarse de incluir el ID del documento
+            allHworks.push(data);
+          });
+          this.hworks = allHworks.sort((a, b) => new Date(b.numero) - new Date(a.numero));
+          this.hworks.forEach(item => {
+            if (!item.endTime) {
+              this.startElapsedTimeTimer(item);
+            }
+          });
+        });
       } catch (error) {
-        console.error('Error al obtener hworkos:', error);
+        console.error('Error al obtener hworks:', error);
       }
     },
     editHwork(hwork) {
@@ -227,9 +276,7 @@ export default {
       });
       if (confirm.isConfirmed) {
         try {
-          // Capturar la fecha y hora actual como Timestamp de Firestore
-          const endTime = Timestamp.now(); // ✅ Firestore Timestamp directo
-          // Calcular el tiempo transcurrido (en milisegundos)
+          const endTime = Timestamp.now();
           const elapsedMs = endTime.toDate() - item.startTime.toDate(); // ✅ Restar directamente
           // Convertir el tiempo transcurrido a HH:mm:ss
           const elapsedHours = Math.floor(elapsedMs / (1000 * 60 * 60));
@@ -238,7 +285,7 @@ export default {
           const elapsedTime = `${elapsedHours.toString().padStart(2, "0")}:${elapsedMinutes.toString().padStart(2, "0")}:${elapsedSeconds.toString().padStart(2, "0")}`;
           // Enviar al backend (Firestore)
           await updateHwork(item.id, {
-            endTime: endTime, // ✅ Guardado como Firestore Timestamp
+            endTime: endTime,
             elapsedTime: elapsedTime,
             status: "out"
           });
@@ -251,7 +298,7 @@ export default {
       }
     },
     formatTime(timestamp) {
-      if (!timestamp || !timestamp.seconds) return "Hora inválida";
+      if (!timestamp || !timestamp.seconds) return "Laborando...";
       const date = new Date(timestamp.seconds * 1000); // Convertir segundos a milisegundos
       // Obtener la hora, minutos y segundos
       const hours = date.getHours().toString().padStart(2, "0");
@@ -275,12 +322,15 @@ export default {
     },
     returnEstado(item) {
       let color = 'default' // Valor por defecto
+      let text = 'default';
       if (item.status === "income") {
-        color = 'success'
+        color = '#D4F8E8',
+        text = '#26734D'
       } else if (item.status === "out") {
-        color = 'red'
+        color = '#FFD6D9',
+        text = '#A8323E'
       }
-      return color
+      return { color, text }
     },
     closeDialog() {
       this.dialogComponent = false;
