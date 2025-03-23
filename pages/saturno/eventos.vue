@@ -3,50 +3,77 @@
     <v-card-title>
       <v-row dense>
         <v-col cols="12" md="12" class="d-flex justify-space-between align-center mb-4">
-          <span class="text-h6">Eventos Diarios</span>
+          <span class="text-h6">
+            <v-icon color="primaryColor" class="mr-3">mdi-calendar-clock</v-icon>
+            Eventos Diarios
+          </span>
           <v-switch
+            color="primaryColor"
             @click="switchMode"
             :label="model ? 'Tarjeta' : 'Tabla'"
           ></v-switch>
-          <v-btn color="primary" small fab dark @click="openNewEvent">
+          <v-btn color="primaryColor" small fab dark @click="openNewEvent">
             <v-icon dark>mdi-plus</v-icon>
           </v-btn>
         </v-col>
-        <v-col cols="12" md="3">
+        <v-col cols="12" md="4">
           <v-text-field
             v-model="searchQuery"
-            color="green"
+            color="secondaryColor"
             label="Buscar Evento"
-            prepend-icon="mdi-magnify"
+            append-icon="mdi-magnify"
             clearable
-          ></v-text-field>
-        </v-col>
-        <v-col cols="12" md="3">
-          <v-autocomplete
-            color="green"
-            hide-no-data
-            hide-selected
-            label="Operacion"
-            prepend-icon="mdi-cog-outline"
-            :items="['CONDESTABLE', 'CEMENTO CL', 'CERRO LINDO', 'ATACOCHA', 'CATALINA HUANCA']"
-            v-model="selectedOperacion"
-          ></v-autocomplete>
-        </v-col>
-        <v-col cols="12" md="3">
-          <v-text-field
-            v-model="fechaFiltro"
-            label="Filtrar por fecha de envío"
-            prepend-icon="mdi-calendar"
-            type="date"
             outlined
             dense
-          ></v-text-field>
+            hide-details
+          />
         </v-col>
-        <v-col cols="12" md="3" class="d-flex justify-end">
-          <v-btn small color="green" dark @click="exportExcel">
+        <v-col cols="12" md="4">
+          <v-autocomplete
+            v-model="selectedOperacion"
+            color="secondaryColor"
+            :items="['CONDESTABLE', 'CEMENTO CL', 'CERRO LINDO', 'ATACOCHA', 'CATALINA HUANCA']"
+            append-icon="mdi-mine"
+            label="Operacion"
+            clearable
+            outlined
+            dense
+            hide-no-data
+            hide-selected
+            hide-details
+          ></v-autocomplete>
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-menu
+            v-model="menuFecha"
+            :close-on-content-click="false"
+            transition="scale-transition"
+            offset-y
+            min-width="auto"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="fechaFiltro"
+                label="Fecha"
+                append-icon="mdi-calendar"
+                color="secondaryColor"
+                v-bind="attrs"
+                v-on="on"
+                readonly
+                clearable
+                outlined
+                dense
+                hide-details
+              ></v-text-field>
+            </template>
+            <v-date-picker color="secondaryColor" v-model="fechaFiltro" @input="menuFecha = false"></v-date-picker>
+          </v-menu>
+        </v-col>
+        <!-- <v-col cols="12" md="3" class="d-flex justify-end">
+          <v-btn small color="secondaryColor" dark @click="exportExcel">
             <v-icon left>mdi-microsoft-excel</v-icon>
           </v-btn>
-        </v-col>
+        </v-col> -->
       </v-row>
     </v-card-title>
     <v-card-text v-if="model">
@@ -66,11 +93,15 @@
           S/.{{ item.monto.toFixed(2) }}
         </template>
         <template v-slot:[`item.estado`]="{ item }">
-          <v-chip :color="returnEstado(item)">{{ item.estado }}</v-chip>
+          <v-chip
+            :color="returnEstado(item).color"
+            :text-color="returnEstado(item).text"
+            class="ma-1"
+          >{{ item.estado }}</v-chip>
         </template>
         <template v-slot:[`item.acciones`]="{ item }">
-          <v-icon small color="blue" @click="editEvent(item)">mdi-pencil</v-icon>
-          <v-icon small color="red" @click="deleteEvent(item.id)">mdi-delete</v-icon>
+          <v-icon small color="secondaryColor" @click="editEvent(item)">mdi-pencil</v-icon>
+          <v-icon small color="dangerColor" @click="deleteEvent(item.id)">mdi-delete</v-icon>
         </template>
       </v-data-table>
     </v-card-text>
@@ -117,7 +148,7 @@
 
 <script>
 import Swal from "sweetalert2";
-import addEvent from '../../components/addEvento.vue';
+import addEvent from '../../components/saturno/addEvento.vue';
 import { getEvents, deleteEvent } from '../../services/eventServices';
 
 export default {
@@ -140,6 +171,7 @@ export default {
         { text: 'Acciones', value: 'acciones', sortable: false }
       ],
       dialogComponent: false,
+      menuFecha: false,
       model: false,
       events: [],
       selectedOperacion: null,
@@ -250,12 +282,15 @@ export default {
     },
     returnEstado(item) {
       let color = 'default' // Valor por defecto
+      let text = 'default';
       if (item.estado === "Cargado") {
-        color = 'success'
+        color = '#D4F8E8',
+        text = '#26734D'
       } else if (item.estado === "Vacío") {
-        color = 'orange'
+        color = '#FFD6D9',
+        text = '#A8323E'
       }
-      return color
+      return { color, text }
     },
     closeDialog() {
       this.dialogComponent = false;

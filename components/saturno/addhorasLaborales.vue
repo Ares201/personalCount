@@ -22,7 +22,7 @@
                       v-model="hwork.date"
                       label="Fecha"
                       append-icon="mdi-calendar"
-                      :color="secondaryColor"
+                      color="secondaryColor"
                       v-bind="attrs"
                       v-on="on"
                       readonly
@@ -32,13 +32,13 @@
                       hide-details
                     />
                   </template>
-                  <v-date-picker :color="secondaryColor" v-model="hwork.date" @input="menuFecha = false"></v-date-picker>
+                  <v-date-picker color="secondaryColor" v-model="hwork.date" @input="menuFecha = false"></v-date-picker>
                 </v-menu>
               </v-col>
               <v-col cols="12" md="8">
                 <v-autocomplete
                   v-model="hwork.operationMina"
-                  :color="secondaryColor"
+                  color="secondaryColor"
                   :items="['CONDESTABLE', 'CEMENTO CL', 'CERRO LINDO', 'NEXA PASCO', 'CATALINA HUANCA']"
                   append-icon="mdi-mine"
                   label="Operacion"
@@ -59,14 +59,14 @@
                 />
               </v-col> -->
               <v-col cols="12" md="12" class="d-flex justify-center align-center">
-                <v-chip v-if="!hwork.startTime" class="ml-2 text-h6" :color="secondaryColor" outlined label>
+                <v-chip v-if="!hwork.startTime" class="ml-2 text-h6" color="secondaryColor" outlined label>
                   {{ currentTime }}
                 </v-chip>
                 <v-text-field
                   v-else
                   class="ml-2 text-h6"
                   v-model="hwork.startTime"
-                  :color="secondaryColor"
+                  color="secondaryColor"
                   outlined type="time"
                   dense
                   hide-details
@@ -75,8 +75,9 @@
                   v-if="hwork.endTime"
                   class="ml-2 text-h6"
                   v-model="hwork.endTime"
-                  :color="secondaryColor"
-                  outlined type="time"
+                  color="secondaryColor"
+                  type="time"
+                  outlined
                   dense
                   hide-details
                 />
@@ -84,7 +85,7 @@
               <v-col cols="12" md="12">
                 <v-autocomplete
                   :items="employees"
-                  :color="secondaryColor"
+                  color="secondaryColor"
                   v-model="hwork.employee"
                   class="custom-autocomplete"
                   label="Empleado"
@@ -118,10 +119,10 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn :color="primaryColor" text @click="saveHwork" :loading="loading">
+        <v-btn color="primaryColor" text @click="saveHwork" :loading="loading">
           {{ this.hwork.id === null ? 'Guardar' : 'Editar' }}
         </v-btn>
-        <v-btn :color="neutralColor" text @click="close">Cancelar</v-btn>
+        <v-btn color="neutralColor" text @click="close">Cancelar</v-btn>
       </v-card-actions>
       <!-- addEmployee -->
         <add-employee
@@ -170,9 +171,6 @@ export default {
       menuFecha: false,
       loading: false,
       currentTime: '',
-      primaryColor: '#FF8F00',
-      secondaryColor: '#2E7D32',
-      neutralColor: "#546E7A",
     }
   },
   watch: {

@@ -4,17 +4,17 @@
       <v-row dense>
         <v-col cols="12" class="d-flex justify-space-between align-center">
           <span class="text-h6">
-            <v-icon :color="primaryColor" class="mr-3">mdi-clock-time-eight-outline</v-icon>
+            <v-icon color="primaryColor" class="mr-3">mdi-clock-time-eight-outline</v-icon>
             HORAS LABORALES
           </span>
-          <v-btn :color="primaryColor" small fab dark @click="openNewHwork">
+          <v-btn color="primaryColor" small fab dark @click="openNewHwork">
             <v-icon dark>mdi-plus</v-icon>
           </v-btn>
         </v-col>
         <v-col cols="12" md="4">
           <v-text-field
             v-model="searchQuery"
-            :color="secondaryColor"
+            color="secondaryColor"
             label="Buscar Empleado"
             append-icon="mdi-magnify"
             class="mt-2"
@@ -27,7 +27,7 @@
         <v-col cols="12" md="4">
           <v-autocomplete
             v-model="selectedEstado"
-            :color="secondaryColor"
+            color="secondaryColor"
             :items="['income', 'out']"
             label="Ingreso"
             append-icon="mdi-filter-outline"
@@ -43,7 +43,7 @@
         <v-col cols="12" md="4">
           <v-autocomplete
             v-model="selectedOperacion"
-            :color="secondaryColor"
+            color="secondaryColor"
             :items="['CONDESTABLE', 'CEMENTO CL', 'CERRO LINDO', 'ATACOCHA', 'CATALINA HUANCA']"
             append-icon="mdi-mine"
             label="Operacion"
@@ -71,7 +71,7 @@
                 v-model="fechaFiltro"
                 label="Fecha"
                 append-icon="mdi-calendar"
-                :color="secondaryColor"
+                color="secondaryColor"
                 v-bind="attrs"
                 v-on="on"
                 readonly
@@ -81,13 +81,13 @@
                 hide-details
               ></v-text-field>
             </template>
-            <v-date-picker :color="secondaryColor" v-model="fechaFiltro" @input="menuFecha = false"></v-date-picker>
+            <v-date-picker color="secondaryColor" v-model="fechaFiltro" @input="menuFecha = false"></v-date-picker>
           </v-menu>
         </v-col>
         <!-- <v-col cols="12" md="4">
           <v-text-field
             v-model="fechaFiltro"
-            :color="secondaryColor"
+            color="secondaryColor"
             label="Fecha"
             type="date"
             clearable
@@ -131,8 +131,8 @@
           </v-chip>
         </template>
         <template v-slot:[`item.acciones`]="{ item }">
-          <v-icon small :color="secondaryColor" class="mr-2" @click="editHwork(item)">mdi-pencil</v-icon>
-          <v-icon small :color="dangerColor" @click="deleteHwork(item.id)">mdi-delete</v-icon>
+          <v-icon small color="secondaryColor" class="mr-2" @click="editHwork(item)">mdi-pencil</v-icon>
+          <v-icon small color="dangerColor" @click="deleteHwork(item.id)">mdi-delete</v-icon>
         </template>
       </v-data-table>
     </v-card-text>
@@ -178,10 +178,6 @@ export default {
       menuFecha: false,
       fechaFiltro: this.getFechaHoy(),
       searchQuery: '',
-      primaryColor: '#FF8F00',
-      secondaryColor: '#2E7D32',
-      neutralColor: "#546E7A",
-      dangerColor: '#E53945'
     };
   },
   computed: {

@@ -51,23 +51,38 @@
                   <v-label>Hora:</v-label>
                   <v-text-field
                     v-model="event.hora"
-                    outlined type="time"
+                    type="time"
+                    outlined
                     dense
                     hide-details
                   />
                 </v-col>
                 <v-col cols="6">
                   <v-label>Estado:</v-label>
-                  <v-select :items="['Cargado', 'Vacío']" v-model="event.estado" outlined dense hide-details clearable />
+                  <v-select
+                    :items="['Cargado', 'Vacío']"
+                    v-model="event.estado"
+                    outlined
+                    dense
+                    hide-details
+                    clearable
+                  />
                 </v-col>
                 <v-col cols="6">
                   <v-label>Cámaras:</v-label>
-                  <v-select :items="['Si Cuenta', 'No Cuenta']" v-model="event.camaras" outlined dense hide-details clearable />
+                  <v-select
+                    :items="['Si Cuenta', 'No Cuenta']"
+                    v-model="event.camaras"
+                    outlined
+                    dense
+                    hide-details
+                    clearable
+                  />
                 </v-col>
                 <v-col cols="12" md="6">
+                  <v-label>Empleado:</v-label>
                   <v-autocomplete
                     :items="employees"
-                    label="Empleado"
                     v-model="event.employee"
                     outlined
                     dense
@@ -75,6 +90,7 @@
                     item-text="name"
                     item-value="id"
                     return-object
+                    hide-details
                   >
                     <template #append-item>
                       <v-divider />
@@ -113,10 +129,10 @@
       </v-card>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="saveEvent" :loading="loading">
+        <v-btn color="primaryColor" text @click="saveEvent" :loading="loading">
           {{ this.event.id === null ? 'Guardar' : 'Editar' }}
         </v-btn>
-        <v-btn color="grey" text @click="close">Cancelar</v-btn>
+        <v-btn color="neutralColor" text @click="close">Cancelar</v-btn>
       </v-card-actions>
        <!-- addEmployee -->
        <add-employee
@@ -128,10 +144,10 @@
   </v-dialog>
 </template>
 <script>
-import { createEvent, updateEvent } from '../services/eventServices';
-import { getEmployees } from '../services/employeeServices';
-import addEmployee from '../components/configuracion/addEmployee';
-
+import Swal from 'sweetalert2'
+import { createEvent, updateEvent } from '../../services/eventServices';
+import { getEmployees } from '../../services/employeeServices';
+import addEmployee from '../../components/configuracion/addEmployee';
 
 export default {
   name: 'addEvent',
@@ -245,6 +261,10 @@ export default {
         console.error('Error al guardar evento:', error)
       }
     },
+    OpenDialogEmployee(){
+      console.log(this.dialogEmployee)
+      this.dialogEmployee = true
+    },
     async getEmployees() {
       try {
         this.employees = await getEmployees()
@@ -252,6 +272,14 @@ export default {
       } catch (error) {
         console.error('Error al obtener empleados:', error)
       }
+    },
+    saveEmployees() {
+      Swal.fire({
+        icon: 'success',
+        title: 'Empleado guardado con éxito',
+        showConfirmButton: false,
+        timer: 1500
+      })
     },
     closedialogEmployee() {
       this.dialogEmployee = false;

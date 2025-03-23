@@ -3,62 +3,89 @@
     <v-card-title>
       <v-row dense>
         <v-col cols="12" class="d-flex justify-space-between align-center">
-          <span class="text-h6">Documento F-R</span>
-          <v-btn color="primary" small fab dark @click="openNewDocument">
+          <span class="text-h6">
+            <v-icon color="primaryColor" class="mr-3">mdi-file-multiple</v-icon>
+            Documento F-R
+          </span>
+          <v-btn color="primaryColor" small fab dark @click="openNewDocument">
             <v-icon dark>mdi-plus</v-icon>
           </v-btn>
         </v-col>
         <v-col cols="12" md="4">
           <v-text-field
             v-model="searchQuery"
-            color="green"
+            color="secondaryColor"
             label="Buscar N° Flash Report"
-            prepend-icon="mdi-magnify"
+            append-icon="mdi-magnify"
             clearable
-          ></v-text-field>
-        </v-col>
-        <v-col cols="12" md="4">
-          <v-autocomplete
-            color="green"
-            hide-no-data
-            hide-selected
-            label="Estado"
-            prepend-icon="mdi-information-outline"
-            :items="['Completado', 'Pendiente', 'En Proceso', 'No Solicitado']"
-            v-model="selectedEstado"
-          ></v-autocomplete>
-        </v-col>
-        <v-col cols="12" md="4">
-          <v-autocomplete
-            color="green"
-            hide-no-data
-            hide-selected
-            label="Operacion"
-            prepend-icon="mdi-cog-outline"
-            :items="['CONDESTABLE', 'CEMENTO CL', 'CERRO LINDO', 'ATACOCHA', 'CATALINA HUANCA']"
-            v-model="selectedOperacion"
-          ></v-autocomplete>
-        </v-col>
-      </v-row>
-      <v-row dense>
-        <v-col cols="12" md="4">
-          <v-text-field
-            v-model="fechaFiltro"
-            label="Filtrar por fecha de envío"
-            prepend-icon="mdi-calendar"
-            type="date"
             outlined
             dense
-          ></v-text-field>
+            hide-details
+          />
         </v-col>
-        <v-spacer></v-spacer>
-        <v-col cols="12" md="4" class="d-flex justify-end">
-          <v-btn color="green" dark @click="exportExcel">
-            <v-icon left>mdi-microsoft-excel</v-icon>
-            Exportar a Excel
-          </v-btn>
+        <v-col cols="12" md="4">
+          <v-autocomplete
+            v-model="selectedEstado"
+            :items="['Completado', 'Pendiente', 'En Proceso', 'No Solicitado']"
+            append-icon="mdi-information-outline"
+            label="Estado"
+            color="secondaryColor"
+            hide-selected
+            hide-no-data
+            clearable
+            outlined
+            dense
+            hide-details
+          ></v-autocomplete>
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-autocomplete
+            v-model="selectedOperacion"
+            color="secondaryColor"
+            :items="['CONDESTABLE', 'CEMENTO CL', 'CERRO LINDO', 'ATACOCHA', 'CATALINA HUANCA']"
+            append-icon="mdi-mine"
+            label="Operacion"
+            clearable
+            outlined
+            dense
+            hide-no-data
+            hide-selected
+            hide-details
+          ></v-autocomplete>
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-menu
+            v-model="menuFecha"
+            :close-on-content-click="false"
+            transition="scale-transition"
+            offset-y
+            min-width="auto"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="fechaFiltro"
+                label="Fecha"
+                append-icon="mdi-calendar"
+                color="secondaryColor"
+                v-bind="attrs"
+                v-on="on"
+                readonly
+                clearable
+                outlined
+                dense
+                hide-details
+              ></v-text-field>
+            </template>
+            <v-date-picker color="secondaryColor" v-model="fechaFiltro" @input="menuFecha = false"></v-date-picker>
+          </v-menu>
         </v-col>
       </v-row>
+      <!-- <v-col cols="12" md="4" class="d-flex justify-end">
+        <v-btn color="green" dark @click="exportExcel">
+          <v-icon left>mdi-microsoft-excel</v-icon>
+          Exportar a Excel
+        </v-btn>
+      </v-col> -->
     </v-card-title>
     <v-card-text>
       <v-data-table
@@ -77,11 +104,15 @@
           S/.{{ item.monto.toFixed(2) }}
         </template>
         <template v-slot:[`item.estado`]="{ item }">
-          <v-chip :color="returnEstado(item)">{{ item.estado }}</v-chip>
+          <v-chip
+            :color="returnEstado(item).color"
+            :text-color="returnEstado(item).text"
+            class="ma-1"
+            >{{ item.estado }}</v-chip>
         </template>
         <template v-slot:[`item.acciones`]="{ item }">
-          <v-icon small color="blue" @click="editDocument(item)">mdi-pencil</v-icon>
-          <v-icon small color="red" @click="deleteDocument(item.id)">mdi-delete</v-icon>
+          <v-icon small color="secondaryColor" @click="editDocument(item)">mdi-pencil</v-icon>
+          <v-icon small color="dangerColor" @click="deleteDocument(item.id)">mdi-delete</v-icon>
         </template>
       </v-data-table>
     </v-card-text>
@@ -121,6 +152,7 @@ export default {
         { text: 'Acciones', value: 'acciones', sortable: false }
       ],
       dialogComponent: false,
+      menuFecha: false,
       documents: [],
       selectedEstado: null,
       selectedOperacion: null,
@@ -207,17 +239,23 @@ export default {
       }
     },
     returnEstado(item) {
-      let color = 'default' // Valor por defecto
+      let color = "default";
+      let text = "default";
+
       if (item.estado === "Completado") {
-        color = 'success'
+        color = "#D4F8E8"; // Verde
+        text = "#26734D";
       } else if (item.estado === "Pendiente") {
-        color = 'warning'
+        color = "#FFD6D9"; // Rojo
+        text = "#A8323E";
       } else if (item.estado === "En Proceso") {
-        color = 'orange'
-      } else if (item.estado === "No Solicitado"){
-        color = 'primary'
+        color = "#FFF4C2"; // Amarillo
+        text = "#B8860B";
+      } else if (item.estado === "No Solicitado") {
+        color = "#E0E0E0"; // Gris
+        text = "#616161";
       }
-      return color
+      return { color, text };
     },
     closeDialog() {
       this.dialogComponent = false;

@@ -62,6 +62,10 @@ export default {
       dark: false,
       themes: {
         dark: {
+          primaryColor: "#FF8F00",
+          secondaryColor: "#2E7D32",
+          neutralColor: "#546E7A",
+          dangerColor: "#E53945",
           primary: colors.blue.darken2,
           accent: colors.grey.darken3,
           secondary: colors.amber.darken3,
@@ -71,6 +75,10 @@ export default {
           success: colors.green.accent3
         },
         light: {
+          primaryColor: "#FF8F00",
+          secondaryColor: "#2E7D32",
+          neutralColor: "#546E7A",
+          dangerColor: "#E53945",
           primary: colors.blue.darken2,
           accent: colors.grey.darken3,
           secondary: colors.amber.darken3,
