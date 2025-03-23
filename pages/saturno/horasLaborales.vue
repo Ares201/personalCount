@@ -163,7 +163,7 @@ export default {
         { text: '#', value: 'index', sortable: false, align: 'center' },
         { text: 'Operacion-Mina', value: 'operationMina', align: 'center' },
         { text: 'Conductor', value: 'employee.name', align: 'center' },
-        { text: 'Jornada', value: 'employee.workHours', align: 'center' },
+        // { text: 'Jornada', value: 'employee.workHours', align: 'center' },
         { text: 'Hora de inicio', value: 'startTime', align: 'center' },
         { text: 'Hora de salida', value: 'endTime', align: 'center' },
         { text: 'Estado', value: 'status' },
@@ -264,25 +264,16 @@ export default {
       return hoy.toISOString().split("T")[0]; // Formato YYYY-MM-DD
     },
     async fetchHworks() {
-      try {
-        // const hworksRef = firebase.firestore().collection('hworks');
-        hworksRef.onSnapshot((snapshot) => {
-          const allHworks = [];
-          snapshot.forEach((doc) => {
-            const data = doc.data();
-            data.id = doc.id; // Asegurarse de incluir el ID del documento
-            allHworks.push(data);
-          });
-          this.hworks = allHworks.sort((a, b) => new Date(b.numero) - new Date(a.numero));
-          this.hworks.forEach(item => {
-            if (!item.endTime) {
-              this.startElapsedTimeTimer(item);
-            }
-          });
+      listenToHworks((hworks) => {
+        this.hworks = hworks.sort((a, b) => new Date(b.numero) - new Date(a.numero));
+
+        // Iniciar el intervalo para los nuevos elementos
+        this.hworks.forEach(item => {
+          if (!item.endTime) {
+            this.startElapsedTimeTimer(item);
+          }
         });
-      } catch (error) {
-        console.error('Error al obtener hworks:', error);
-      }
+      });
     },
     editHwork(hwork) {
       console.log('Editar', hwork)

@@ -9,7 +9,7 @@
         <v-form ref="form">
           <v-container>
             <v-row dense>
-              <v-col cols="12" md="12">
+              <v-col cols="12" md="4">
                 <v-menu
                   v-model="menuFecha"
                   :close-on-content-click="false"
@@ -35,14 +35,13 @@
                   <v-date-picker :color="secondaryColor" v-model="hwork.date" @input="menuFecha = false"></v-date-picker>
                 </v-menu>
               </v-col>
-              <v-col cols="12" md="12">
+              <v-col cols="12" md="8">
                 <v-autocomplete
                   v-model="hwork.operationMina"
                   :color="secondaryColor"
                   :items="['CONDESTABLE', 'CEMENTO CL', 'CERRO LINDO', 'NEXA PASCO', 'CATALINA HUANCA']"
                   append-icon="mdi-mine"
                   label="Operacion"
-                  class="mt-2"
                   clearable
                   outlined
                   dense
@@ -59,24 +58,30 @@
                   dense
                 />
               </v-col> -->
-              <v-switch
-                @click="switchMode"
-                :label="model ? 'Ahora' : 'Ingresar'"
-                :color="secondaryColor"
-              ></v-switch>
-              <v-col cols="12" md="12" class="d-flex justify-center">
-                <v-chip v-if="!model" class="mx-4 mt-1 text-h6" :color="secondaryColor" outlined label>
+              <v-col cols="12" md="12" class="d-flex justify-center align-center">
+                <v-chip v-if="!hwork.startTime" class="ml-2 text-h6" :color="secondaryColor" outlined label>
                   {{ currentTime }}
                 </v-chip>
                 <v-text-field
                   v-else
-                  class="mx-4 text-h6"
+                  class="ml-2 text-h6"
                   v-model="hwork.startTime"
                   :color="secondaryColor"
                   outlined type="time"
                   dense
                   hide-details
                 />
+                <v-text-field
+                  v-if="hwork.endTime"
+                  class="ml-2 text-h6"
+                  v-model="hwork.endTime"
+                  :color="secondaryColor"
+                  outlined type="time"
+                  dense
+                  hide-details
+                />
+              </v-col>
+              <v-col cols="12" md="12">
                 <v-autocomplete
                   :items="employees"
                   :color="secondaryColor"
@@ -87,8 +92,9 @@
                   item-value="id"
                   return-object
                   outlined
-                  dense
                   clearable
+                  dense
+                  hide-details
                 >
                   <template #append-item>
                     <v-divider />
@@ -103,10 +109,7 @@
               </v-col>
               <v-col cols="12" md="12">
                 <v-sheet class="pa-2 rounded-lg border-radio">
-                  <v-radio-group v-model="hwork.status" row>
-                    <v-radio :color="secondaryColor" label="Ingreso" value="income"></v-radio>
-                    <v-radio :color="primaryColor" label="Salida" value="out"></v-radio>
-                  </v-radio-group>
+                  <label for="">Ingreso</label>
                 </v-sheet>
               </v-col>
             </v-row>
@@ -166,7 +169,6 @@ export default {
       dialogEmployee: false,
       menuFecha: false,
       loading: false,
-      model: false,
       currentTime: '',
       primaryColor: '#FF8F00',
       secondaryColor: '#2E7D32',
@@ -191,7 +193,13 @@ export default {
     },
     hworks: {
       handler(newHwork) {
-        this.hwork = { ...newHwork }
+        if (newHwork) {
+          this.hwork = {
+            ...newHwork,
+            startTime: this.formatTime(newHwork.startTime),
+            endTime: this.formatTime(newHwork.endTime),
+          };
+        }
       },
       deep: true
     }
@@ -209,12 +217,22 @@ export default {
     this.getEmployees()
   },
   methods: {
-    switchMode(){
-      this.model = !this.model
+    formatTime(timestamp) {
+      if (timestamp?.seconds) {
+        return new Date(timestamp.seconds * 1000).toLocaleTimeString("es-PE", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false
+        });
+      }
+      return "";
     },
     async saveHwork() {
       try {
         this.loading = true;
+        if (!this.hwork.startTime) {
+          this.hwork.startTime = this.currentTime;
+        }
         if (this.hwork.startTime) {
           const [hours, minutes] = this.hwork.startTime.split(":").map(Number);
           const startDate = new Date();
@@ -233,7 +251,7 @@ export default {
           await createHwork({
             startTime: this.hwork.startTime,
             date: this.hwork.date,
-            status: this.hwork.status,
+            status: 'income',
             employee: this.hwork.employee,
             operationMina: this.hwork.operationMina
           });
