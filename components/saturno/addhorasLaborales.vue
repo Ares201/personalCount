@@ -152,9 +152,10 @@ export default {
       default: () => ({
         id: null,
         startTime: '',
+        operationMina: '',
+        endTime: '',
         employee: null,
         status:'',
-        operationMina: ''
       })
     }
   },
@@ -181,6 +182,7 @@ export default {
           {
             id: null,
             startTime: '',
+            endTime: '',
             employee: null,
             status:'',
             operationMina: ''
@@ -237,17 +239,25 @@ export default {
           startDate.setHours(hours, minutes, 0, 0);
           this.hwork.startTime = Timestamp.fromDate(startDate);
         }
+        if (this.hwork.endTime) {
+          const [hours, minutes] = this.hwork.endTime.split(":").map(Number);
+          const startDate = new Date();
+          startDate.setHours(hours, minutes, 0, 0);
+          this.hwork.endTime = Timestamp.fromDate(startDate);
+        }
         if (this.hwork.id) {
           await updateHwork(this.hwork.id, {
             startTime: this.hwork.startTime,
             date: this.hwork.date,
             status: this.hwork.status,
             employee: this.hwork.employee,
+            endTime: this.hwork.endTime,
             operationMina: this.hwork.operationMina
           });
         } else {
           await createHwork({
             startTime: this.hwork.startTime,
+            endTime: this.hwork.endTime,
             date: this.hwork.date,
             status: 'income',
             employee: this.hwork.employee,
@@ -299,6 +309,8 @@ export default {
         id: null,
         status: '',
         employee: '',
+        startTime: '',
+        endTime: '',
         operationMina:''
       }
     },

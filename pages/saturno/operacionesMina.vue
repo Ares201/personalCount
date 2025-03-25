@@ -4,8 +4,8 @@
       <v-row dense>
         <v-col cols="12" class="d-flex justify-space-between align-center">
           <span class="text-h6">
-            <v-icon color="primaryColor" class="mr-3">mdi-account</v-icon>
-            EMPLEADOS
+            <v-icon color="primaryColor" class="mr-3">mdi-mine</v-icon>
+            OPERACIONES - MINA
           </span>
           <v-btn color="primaryColor" small fab dark @click="dialogComponent= true">
             <v-icon dark>mdi-plus</v-icon>
@@ -15,7 +15,7 @@
           <v-text-field
             v-model="searchQuery"
             color="secondaryColor"
-            label="Buscar Empleado"
+            label="Buscar Operacion"
             append-icon="mdi-magnify"
             class="mt-2"
             clearable
@@ -29,7 +29,7 @@
     <v-card-text>
       <v-data-table
         :headers="headers"
-        :items="empleados"
+        :items="operations"
         :search="searchQuery"
         item-value="id"
         dense
@@ -38,77 +38,76 @@
           {{ index + 1 }}
         </template>
         <template v-slot:[`item.acciones`]="{ item }">
-          <v-icon small color="secondaryColor" @click="editEmployee(item)">mdi-pencil</v-icon>
-          <v-icon small color="dangerColor" @click="deleteEmployee(item.id)">mdi-delete</v-icon>
+          <v-icon small color="secondaryColor" @click="editOperationMine(item)">mdi-pencil</v-icon>
+          <v-icon small color="dangerColor" @click="deleteOperationMine(item.id)">mdi-delete</v-icon>
         </template>
       </v-data-table>
     </v-card-text>
-    <!-- Componente addEmployee -->
-    <add-employee
+    <!-- Componente addOperationMine -->
+    <add-operationMine
       :dialog = "dialogComponent"
       @closedialog="closedialog"
-      @saveEmployee="fetchEmployees"
-      :employee="selectedEmployee"
+      @saveOperationMine="fetchOperationMines"
+      :operationMine="selectedOperationMine"
     />
   </v-card>
 </template>
 
 <script>
-import {  getEmployees, deleteEmployee } from '~/services/employeeServices'
-import addEmployee from '../../components/configuracion/addEmployee.vue';
+import {  getOperationMines, deleteOperationMine } from '~/services/operationMineServices'
+import addOperationMine from '../../components/configuracion/addOperationMine.vue';
 export default {
-  name: 'Empleados',
+  name: 'Operaciones',
   components:{
-    addEmployee
+    addOperationMine
   },
   data() {
     return {
       headers: [
-        { text: '#', value: 'index', sortable: false },
         { text: 'Nombre', value: 'name', sortable: false },
-        { text: 'Puesto de Trabajo', value: 'workstation', sortable: false },
-        { text: 'Area', value: 'area', sortable: false },
-        { text: 'Horas de Trabajo', value: 'workHours', sortable: false },
+        { text: 'Distrito', value: 'district', sortable: false },
+        { text: 'Departamento', value: 'department', sortable: false },
+        { text: 'Estado', value: 'status', sortable: false },
         { text: 'Acciones', value: 'acciones', sortable: false }
       ],
-      empleados: [],
+      operations: [],
       search: '',
       dialog: false,
       dialogComponent: false,
-      selectedEmployee: null,
+      selectedOperationMine: null,
       searchQuery: '',
     }
   },
   computed: {
     filteredHworks() {
-      return this.empleados.filter(doc => {
+      return this.operations.filter(doc => {
         const searchMatch = !this.searchQuery || doc.name.toString().includes(this.searchQuery);
         return searchMatch;
       });
     }
   },
   async beforeMount() {
-    await this.fetchEmployees()
+    await this.fetchOperationMines()
   },
   methods: {
-    async fetchEmployees() {
+    async fetchOperationMines() {
       try {
-        this.empleados = await getEmployees()
+        this.operations = await getOperationMines()
       } catch (error) {
         console.error('Error al obtener Registros.', error)
       }
     },
-    editEmployee(employee) {
-      this.selectedEmployee = { ...employee }
+    editOperationMine(operationMine) {
+      this.selectedOperationMine = { ...operationMine }
       this.dialogComponent = true
     },
-    async deleteEmployee(employeeId) {
-      if (confirm('¿Estás seguro de eliminar este empleado?')) {
+    async deleteOperationMine(operationMineId) {
+      if (confirm('¿Estás seguro de eliminar este operacion?')) {
         try {
-          await deleteEmployee(employeeId)
-          await this.fetchEmployees()
+          await deleteOperationMine(operationMineId)
+          await this.fetchOperationMines()
         } catch (error) {
-          console.error('Error al eliminar empleado:', error)
+          console.error('Error al eliminar operacion:', error)
         }
       }
     },

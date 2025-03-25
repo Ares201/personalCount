@@ -1,41 +1,82 @@
 <template>
   <v-dialog v-model="dialog" max-width="500px">
   <v-card>
-    <v-card-title>
+    <v-card-title class="justify-center mb-2">
       <span class="text-h6">{{ formTitle }}</span>
     </v-card-title>
+    <v-divider class="mb-4"></v-divider>
     <v-card-text>
       <v-form ref="form">
-        <v-text-field
-          label="Nombre"
-          v-model="currentEmployee.name"
-          outlined
-          required
-        ></v-text-field>
-        <v-text-field
-          label="Puesto de Trabajo"
-          v-model="currentEmployee.workstation"
-          outlined
-          required
-        ></v-text-field>
-        <v-text-field
-          label="Area"
-          v-model="currentEmployee.area"
-          outlined
-          required
-        ></v-text-field>
-        <v-text-field
-          label="Horas de Trabajo"
-          v-model="currentEmployee.workHours"
-          outlined
-          required
-        ></v-text-field>
+        <v-container>
+          <v-row dense>
+            <v-col cols="12" md="6">
+              <v-text-field
+                label="Nombre"
+                v-model="currentEmployee.name"
+                outlined
+                dense
+                hide-details
+              />
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                label="Puesto de Trabajo"
+                v-model="currentEmployee.workstation"
+                outlined
+                dense
+                hide-details
+              />
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                label="Area"
+                v-model="currentEmployee.area"
+                outlined
+                dense
+                hide-details
+              />
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                label="Horas de Trabajo"
+                v-model="currentEmployee.workHours"
+                outlined
+                dense
+                hide-details
+              />
+            </v-col>
+            <v-col cols="12" md="12">
+              Datos Personales
+              <v-divider></v-divider>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                label="DNI"
+                v-model="currentEmployee.dni"
+                outlined
+                dense
+                hide-details
+              />
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                label="Telefono"
+                v-model="currentEmployee.phone"
+                outlined
+                dense
+                hide-details
+              />
+            </v-col>
+          </v-row>
+        </v-container>
       </v-form>
     </v-card-text>
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn color="blue darken-1" text @click="saveEmployee">Guardar</v-btn>
-      <v-btn color="grey" text @click="close">Cancelar</v-btn>
+      <v-btn color="primaryColor" text @click="saveEmployee" :loading="loading">
+          {{ this.currentEmployee.id === null ? 'Guardar' : 'Editar' }}
+        </v-btn>
+      <v-btn color="neutralColor" text @click="close">Cancelar</v-btn>
     </v-card-actions>
   </v-card>
 </v-dialog>
@@ -46,7 +87,17 @@ export default {
 name: 'addEmployee',
 props: {
   dialog: { type: Boolean, default: false },
-  employee: { type: Object, default: () => ({ id: null, name: '', workstation: '', area: '', workHours: '' }) }  // Empleado a editar
+  employee: {
+    type: Object, default: () => ({
+      id: null,
+      name: '',
+      workstation: '',
+      area: '',
+      workHours: '',
+      dni:'',
+      phone:'',
+    })
+  }  // Empleado a editar
 },
 data() {
   return {
@@ -75,6 +126,8 @@ methods: {
           workstation: this.currentEmployee.workstation,
           area: this.currentEmployee.area,
           workHours: this.currentEmployee.workHours,
+          dni: this.currentEmployee.dni,
+          phone: this.currentEmployee.phone,
         })
       } else {
         await createEmployee({
@@ -82,6 +135,8 @@ methods: {
           workstation: this.currentEmployee.workstation,
           area: this.currentEmployee.area,
           workHours: this.currentEmployee.workHours,
+          dni: this.currentEmployee.dni,
+          phone: this.currentEmployee.phone,
         })
       }
       this.$emit('saveEmployee')
@@ -98,6 +153,8 @@ methods: {
       workstation: '',
       area: '',
       workHours: '',
+      dni: '',
+      phone: '',
     }
   },
 }

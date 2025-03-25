@@ -37,6 +37,7 @@
       </v-list>
     </v-navigation-drawer>
     <v-app-bar
+      class="primary-background"
       :clipped-left="clipped"
       fixed
       app
@@ -60,7 +61,7 @@
       >
         <v-icon>mdi-minus</v-icon>
       </v-btn>
-      <v-toolbar-title>{{ title }}</v-toolbar-title>
+      <v-toolbar-title>{{ titleHead }}</v-toolbar-title>
       <v-spacer />
       <v-btn
         icon
@@ -134,7 +135,7 @@ export default {
     right: true,
     rightDrawer: false,
     user: { role: '', permissions: [] },
-    title: 'ARES',
+    titleHead: 'ARES',
     items: [
       {
         icon: 'mdi-apps',
@@ -147,7 +148,8 @@ export default {
         children: [
           { title: 'Usuarios', to: '/mantenimiento/usuarios' },
           { title: 'Permisos', to: '/mantenimiento/permisos' },
-          { title: 'Empleados', to: '/mantenimiento/empleados' }
+          { title: 'Empleados', to: '/mantenimiento/empleados' },
+          { title: 'Operaciones Mina', to: '/saturno/operacionesMina' }
         ]
       },
       {
@@ -217,3 +219,9 @@ computed: {
   }
 }
 </script>
+<style scoped>
+/* .primary-background {
+  background-color: #2E7D32 !important;
+  color: white;
+} */
+</style>

@@ -10,28 +10,24 @@
           label="Fecha"
           v-model="salida.fecha"
           outlined
-          required
           type="date"
         />
         <v-text-field
           label="Monto"
           v-model="salida.monto"
           outlined
-          required
         />
         <v-select
           :items="['Compras', 'Prestamo', 'Otros']"
           label="Categoria"
           v-model="salida.categoria"
           outlined
-          required
           clearable
         />
         <v-text-field
           v-model="salida.descripcion"
           label="Descripción"
           outlined
-          required
         />
       </v-form>
     </v-card-text>

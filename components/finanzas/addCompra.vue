@@ -12,7 +12,6 @@
                 label="Fecha"
                 v-model="compra.fecha"
                 outlined
-                required
                 type="date"
               />
             </v-col>
@@ -21,7 +20,6 @@
                 v-model="compra.concepto"
                 label="Concepto"
                 outlined
-                required
               />
             </v-col>
             <v-col cols="12" md="6">
@@ -29,7 +27,6 @@
                 v-model="compra.descripcion"
                 label="Descripción"
                 outlined
-                required
               />
             </v-col>
           </v-row>
@@ -109,13 +106,11 @@
                     label="Detalle"
                     v-model="newDetail.detalle"
                     outlined
-                    required
                   />
                   <v-text-field
                     label="Monto"
                     v-model="newDetail.monto"
                     outlined
-                    required
                     type="number"
                   />
                 </v-form>

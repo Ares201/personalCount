@@ -5,7 +5,7 @@
         <v-col cols="12" class="d-flex justify-space-between align-center">
           <span class="text-h6">
             <v-icon color="primaryColor" class="mr-3">mdi-file-multiple</v-icon>
-            Documento F-R
+            DOCUMENTO F-R
           </span>
           <v-btn color="primaryColor" small fab dark @click="openNewDocument">
             <v-icon dark>mdi-plus</v-icon>

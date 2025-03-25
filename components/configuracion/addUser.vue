@@ -10,28 +10,24 @@
             label="Nombre"
             v-model="currentUser.name"
             outlined
-            required
           ></v-text-field>
           <v-text-field
             label="Email"
             v-model="currentUser.email"
             type="email"
             outlined
-            required
           ></v-text-field>
           <v-text-field
             label="Seguridad"
             v-model="currentUser.password"
             type="email"
             outlined
-            required
           ></v-text-field>
           <v-select
             v-model="currentUser.role"
             :items="['Administrador', 'Usuario']"
             label="Rol"
             outlined
-            required
             clearable
           />
         </v-form>

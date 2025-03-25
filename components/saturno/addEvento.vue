@@ -106,12 +106,14 @@
                 <v-col cols="6">
                   <v-label>Contrato:</v-label>
                   <v-select
-                    :items="['CONDESTABLE', 'CEMENTO CL', 'CERRO LINDO', 'ATACOCHA', 'CATALINA HUANCA']"
+                    :items="operations"
                     v-model="event.contrato"
                     outlined
                     dense
                     hide-details
                     clearable
+                    item-text="name"
+                    item-value="id"
                   />
                 </v-col>
                 <v-col cols="6">
@@ -147,6 +149,7 @@
 import Swal from 'sweetalert2'
 import { createEvent, updateEvent } from '../../services/eventServices';
 import { getEmployees } from '../../services/employeeServices';
+import { getOperationMines } from '../../services/operationMineServices';
 import addEmployee from '../../components/configuracion/addEmployee';
 
 export default {
@@ -180,6 +183,7 @@ export default {
       loading: false,
       event: { ...this.events },
       employees : [],
+      operations : [],
       dialogEmployee: false,
     }
   },
@@ -220,11 +224,12 @@ export default {
   },
   beforeMount() {
     this.getEmployees()
+    this.getOperationMines()
   },
   methods: {
     async saveEvent() {
       try {
-        this.loading= true
+        this.loading = true
         if (this.event.id) {
           await updateEvent(this.event.id, {
             evento: this.event.evento,
@@ -273,6 +278,13 @@ export default {
         console.error('Error al obtener empleados:', error)
       }
     },
+    async getOperationMines() {
+      try {
+        this.operations = await getOperationMines()
+      } catch (error) {
+        console.error('Error al obtener operaciones:', error)
+      }
+    },
     saveEmployees() {
       Swal.fire({
         icon: 'success',
@@ -284,6 +296,7 @@ export default {
     closedialogEmployee() {
       this.dialogEmployee = false;
       this.getEmployees()
+      this.getOperationMines()
     },
     close() {
       this.$emit('closedialog')

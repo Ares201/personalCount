@@ -10,21 +10,18 @@
           label="Fecha"
           v-model="ingreso.fecha"
           outlined
-          required
           type="date"
         ></v-text-field>
         <v-text-field
           label="Monto"
           v-model="ingreso.monto"
           outlined
-          required
         ></v-text-field>
         <v-select
           v-model="ingreso.categoria"
           :items="['Saturno', 'Studioxperto', 'Otros']"
           label="Categoria"
           outlined
-          required
           clearable
         />
         <v-text-field

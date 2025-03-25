@@ -5,7 +5,7 @@
         <v-col cols="12" md="12" class="d-flex justify-space-between align-center mb-4">
           <span class="text-h6">
             <v-icon color="primaryColor" class="mr-3">mdi-calendar-clock</v-icon>
-            Eventos Diarios
+            EVENTOS - DIFUSIONES
           </span>
           <v-switch
             color="primaryColor"
@@ -123,7 +123,7 @@
                     <div><strong>Hora:</strong> {{ event.hora }}</div>
                     <div><strong>Estado:</strong> {{ event.estado }}</div>
                     <div><strong>Cámaras:</strong> {{ event.camaras }}</div>
-                    <div><strong>Operador:</strong> {{ event.operador }}</div>
+                    <div><strong>Operador:</strong> {{ event.employee.name }}</div>
                     <div><strong>Contrato:</strong> {{ event.contrato }}</div>
                     <div><strong>Ubicación:</strong> {{ event.ubicacion }}</div>
                     <div><strong>Detalles:</strong> {{ event.detalle }}</div>
@@ -166,7 +166,7 @@ export default {
         { text: 'Fecha', value: 'fecha' },
         { text: 'Hora', value: 'hora' },
         { text: 'Estado', value: 'estado' },
-        { text: 'Operador', value: 'operador' },
+        { text: 'Operador', value: 'employee.name' },
         { text: 'Contrato', value: 'contrato' },
         { text: 'Acciones', value: 'acciones', sortable: false }
       ],
@@ -205,13 +205,13 @@ export default {
       *Hora:* ${event.hora}
       *Estado:* ${event.estado}
       *Cámaras:* ${event.camaras}
-      *Operador:* ${event.operador}
+      *Operador:* ${event.employee.name}
       *Contrato:* ${event.contrato}
       *Ubicación:* ${event.ubicacion}
       *Detalles:* ${event.detalle}
       `.trim();
       navigator.clipboard.writeText(formattedText).then(() => {
-        alert("Texto copiado, ahora puedes pegarlo en WhatsApp 📲");
+        // alert("Texto copiado, ahora puedes pegarlo en WhatsApp 📲")
       }).catch(err => {
         console.error("Error al copiar: ", err);
       });
@@ -229,7 +229,7 @@ export default {
         hora: '',
         estado: '',
         camaras: '',
-        operador: '',
+        employee: '',
         contrato: '',
         ubicacion: '',
         detalle: ''
