@@ -149,7 +149,8 @@ export default {
           { title: 'Usuarios', to: '/mantenimiento/usuarios' },
           { title: 'Permisos', to: '/mantenimiento/permisos' },
           { title: 'Empleados', to: '/mantenimiento/empleados' },
-          { title: 'Operaciones Mina', to: '/saturno/operacionesMina' }
+          // { title: 'Editar Operaciones', to: '/mantenimiento/editOperation'},
+          { title: 'Operaciones Mina', to: '/saturno/operacionesMina' },
         ]
       },
       {

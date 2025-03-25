@@ -39,8 +39,8 @@
                 <v-autocomplete
                   v-model="hwork.operationMina"
                   color="secondaryColor"
-                  :items="['CONDESTABLE', 'CEMENTO CL', 'CERRO LINDO', 'NEXA PASCO', 'CATALINA HUANCA']"
-                  append-icon="mdi-mine"
+                  :items="operations"
+                  item-text="name"
                   label="Operacion"
                   clearable
                   outlined
@@ -139,6 +139,7 @@ import { Timestamp } from "firebase/firestore";
 import { createHwork, updateHwork } from '../../services/hworkServices';
 import { getEmployees } from '../../services/employeeServices';
 import addEmployee from '../../components/configuracion/addEmployee';
+import { getOperationMines } from '../../services/operationMineServices';
 
 export default {
   name: 'addHwork',
@@ -162,6 +163,7 @@ export default {
   data() {
     return {
       employees : [],
+      operations : [],
       hwork: { ...this.hworks },
       currentEmployee: {
         name: '',
@@ -215,6 +217,7 @@ export default {
   },
   beforeMount() {
     this.getEmployees()
+    this.getOperationMines()
   },
   methods: {
     formatTime(timestamp) {
@@ -274,6 +277,13 @@ export default {
     OpenDialogEmployee(){
       console.log(this.dialogEmployee)
       this.dialogEmployee = true
+    },
+    async getOperationMines() {
+      try {
+        this.operations = await getOperationMines()
+      } catch (error) {
+        console.error('Error al obtener operaciones:', error)
+      }
     },
     async getEmployees() {
       try {

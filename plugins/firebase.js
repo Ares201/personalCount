@@ -19,4 +19,8 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+export default (context, inject) => {
+  inject("db", db); // 🔹 Inyectamos Firestore en el contexto
+};
+
 export { auth, db };

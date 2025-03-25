@@ -26,14 +26,19 @@
                 />
               </v-col>
               <v-col cols="12" md="6">
-                <v-select
-                  :items="['CONDESTABLE', 'CEMENTO CL', 'ECOSERM CL', 'CERRO LINDO', 'ATACOCHA', 'CATALINA HUANCA', 'EN BASE']"
-                  label="Operación"
+                <v-autocomplete
                   v-model="document.operacion"
+                  color="secondaryColor"
+                  :items="operations"
+                  item-text="name"
+                  label="Operacion"
+                  clearable
                   outlined
                   dense
-                  clearable
-                />
+                  hide-no-data
+                  hide-selected
+                  hide-details
+                ></v-autocomplete>
               </v-col>
               <v-col cols="6" md="3">
                 <v-text-field
@@ -71,13 +76,14 @@
               <v-col cols="12" md="6">
                 <v-autocomplete
                   :items="employees"
-                  label="Empleado"
                   v-model="document.employee"
+                  item-text="name"
+                  item-value="id"
+                  label="Empleado"
+                  color="secondaryColor"
                   outlined
                   dense
                   clearable
-                  item-text="name"
-                  item-value="id"
                   return-object
                 >
                   <template #append-item>
@@ -164,9 +170,10 @@
 </template>
 <script>
 import Swal from 'sweetalert2'
-import { createDocument, updateDocument } from '../services/documentServices';
-import { getEmployees } from '../services/employeeServices';
-import addEmployee from '../components/configuracion/addEmployee';
+import { createDocument, updateDocument } from '../../services/documentServices';
+import { getEmployees } from '../../services/employeeServices';
+import addEmployee from '../../components/configuracion/addEmployee';
+import { getOperationMines } from '../../services/operationMineServices';
 
 export default {
   name: 'addDocument',
@@ -200,6 +207,7 @@ export default {
       loading: false,
       document: { ...this.documents },
       employees : [],
+      operations : [],
       dialogEmployee: false,
       currentEmployee: {  // Added property
         name: '',
@@ -247,6 +255,7 @@ export default {
   },
   beforeMount() {
     this.getEmployees()
+    this.getOperationMines()
   },
   methods: {
     async saveDocument() {
@@ -296,6 +305,13 @@ export default {
       console.log(this.dialogEmployee)
       this.dialogEmployee = true
     },
+    async getOperationMines() {
+      try {
+        this.operations = await getOperationMines()
+      } catch (error) {
+        console.error('Error al obtener operaciones:', error)
+      }
+    },
     async getEmployees() {
       try {
         this.employees = await getEmployees()
@@ -315,6 +331,7 @@ export default {
     closedialogEmployee() {
       this.dialogEmployee = false;
       this.getEmployees()
+      this.getOperationMines()
     },
     close() {
       this.$emit('closedialog')

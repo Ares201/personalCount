@@ -104,17 +104,20 @@
                   </v-autocomplete>
                 </v-col>
                 <v-col cols="6">
-                  <v-label>Contrato:</v-label>
-                  <v-select
-                    :items="operations"
+                  <v-label>Operaciòn:</v-label>
+                  <v-autocomplete
                     v-model="event.contrato"
-                    outlined
-                    dense
-                    hide-details
-                    clearable
+                    color="secondaryColor"
+                    :items="operations"
                     item-text="name"
                     item-value="id"
-                  />
+                    clearable
+                    outlined
+                    dense
+                    hide-no-data
+                    hide-selected
+                    hide-details
+                  ></v-autocomplete>
                 </v-col>
                 <v-col cols="6">
                   <v-label>Ubicación:</v-label>

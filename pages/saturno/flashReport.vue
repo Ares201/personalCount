@@ -42,9 +42,10 @@
           <v-autocomplete
             v-model="selectedOperacion"
             color="secondaryColor"
-            :items="['CONDESTABLE', 'CEMENTO CL', 'CERRO LINDO', 'ATACOCHA', 'CATALINA HUANCA']"
+            :items="operations"
             append-icon="mdi-mine"
             label="Operacion"
+            item-text="name"
             clearable
             outlined
             dense
@@ -127,8 +128,9 @@
 
 <script>
 import Swal from "sweetalert2";
-import addDocument from '../../components/addFlashR.vue';
+import addDocument from '../../components/saturno/addFlashR.vue';
 import { getDocuments, deleteDocument } from '../../services/documentServices';
+import { getOperationMines } from '../../services/operationMineServices';
 
 export default {
   name: 'Documents',
@@ -154,6 +156,7 @@ export default {
       dialogComponent: false,
       menuFecha: false,
       documents: [],
+      operations : [],
       selectedEstado: null,
       selectedOperacion: null,
       selectedDocument: null,
@@ -174,6 +177,7 @@ export default {
   },
   async beforeMount() {
     await this.fetchDocuments();
+    await this.getOperationMines()
   },
   methods: {
     openNewDocument() {
@@ -200,6 +204,13 @@ export default {
     getFechaHoy() {
       const hoy = new Date();
       return hoy.toISOString().split("T")[0]; // Formato YYYY-MM-DD
+    },
+    async getOperationMines() {
+      try {
+        this.operations = await getOperationMines()
+      } catch (error) {
+        console.error('Error al obtener operaciones:', error)
+      }
     },
     async fetchDocuments() {
       try {

@@ -32,9 +32,11 @@
           <v-autocomplete
             v-model="selectedOperacion"
             color="secondaryColor"
-            :items="['CONDESTABLE', 'CEMENTO CL', 'CERRO LINDO', 'ATACOCHA', 'CATALINA HUANCA']"
+            :items="operations"
             append-icon="mdi-mine"
             label="Operacion"
+            item-text="name"
+            item-value="id"
             clearable
             outlined
             dense
@@ -150,6 +152,7 @@
 import Swal from "sweetalert2";
 import addEvent from '../../components/saturno/addEvento.vue';
 import { getEvents, deleteEvent } from '../../services/eventServices';
+import { getOperationMines } from '../../services/operationMineServices';
 
 export default {
   name: 'Events',
@@ -170,6 +173,7 @@ export default {
         { text: 'Contrato', value: 'contrato' },
         { text: 'Acciones', value: 'acciones', sortable: false }
       ],
+      operations : [],
       dialogComponent: false,
       menuFecha: false,
       model: false,
@@ -192,6 +196,7 @@ export default {
   },
   async beforeMount() {
     await this.fetchEvents();
+    await this.getOperationMines()
   },
   methods: {
     copyToClipboard(event) {
@@ -242,6 +247,13 @@ export default {
     getFechaHoy() {
       const hoy = new Date();
       return hoy.toISOString().split("T")[0]; // Formato YYYY-MM-DD
+    },
+    async getOperationMines() {
+      try {
+        this.operations = await getOperationMines()
+      } catch (error) {
+        console.error('Error al obtener operaciones:', error)
+      }
     },
     async fetchEvents() {
       try {

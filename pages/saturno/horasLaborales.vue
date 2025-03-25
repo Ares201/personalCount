@@ -44,9 +44,10 @@
           <v-autocomplete
             v-model="selectedOperacion"
             color="secondaryColor"
-            :items="['CONDESTABLE', 'CEMENTO CL', 'CERRO LINDO', 'ATACOCHA', 'CATALINA HUANCA']"
+            :items="operations"
             append-icon="mdi-mine"
             label="Operacion"
+            item-text="name"
             class="mt-2"
             clearable
             outlined
@@ -150,6 +151,7 @@ import Swal from "sweetalert2";
 import addHwork from '../../components/saturno/addhorasLaborales.vue';
 import { Timestamp } from "firebase/firestore";
 import { listenToHworks, deleteHwork, updateHwork } from '../../services/hworkServices';
+import { getOperationMines } from '../../services/operationMineServices';
 
 export default {
   name: 'Hworks',
@@ -171,6 +173,7 @@ export default {
         { text: 'Acciones', value: 'acciones', sortable: false, align: 'center' }
       ],
       hworks: [],
+      operations : [],
       selectedOperacion: null,
       selectedEstado: null,
       selectedHwork: null,
@@ -193,6 +196,7 @@ export default {
   },
   mounted() {
     this.listenToHworks();
+    this.getOperationMines()
   },
   beforeDestroy() {
     // Detener los intervalos individuales
@@ -212,6 +216,13 @@ export default {
           }
         });
       });
+    },
+    async getOperationMines() {
+      try {
+        this.operations = await getOperationMines()
+      } catch (error) {
+        console.error('Error al obtener operaciones:', error)
+      }
     },
     startElapsedTimeTimer(item) {
       if (!item.endTime) {
