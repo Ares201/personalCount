@@ -102,8 +102,22 @@
           >{{ item.estado }}</v-chip>
         </template>
         <template v-slot:[`item.acciones`]="{ item }">
-          <v-icon small color="secondaryColor" @click="editEvent(item)">mdi-pencil</v-icon>
-          <v-icon small color="dangerColor" @click="deleteEvent(item.id)">mdi-delete</v-icon>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon small color="secondaryColor" @click="editEvent(item)" v-bind="attrs" v-on="on">
+                mdi-pencil
+              </v-icon>
+            </template>
+            <span>Editar</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon small color="dangerColor" @click="deleteEvent(item.id)" v-bind="attrs" v-on="on" >
+                mdi-delete
+              </v-icon>
+            </template>
+            <span>Eliminar</span>
+          </v-tooltip>
         </template>
       </v-data-table>
     </v-card-text>

@@ -15,6 +15,7 @@
                   v-model="document.numero"
                   outlined
                   dense
+                  hide-details
                 />
               </v-col>
               <v-col cols="12" md="9">
@@ -23,6 +24,7 @@
                   v-model="document.evento"
                   outlined
                   dense
+                  hide-details
                 />
               </v-col>
               <v-col cols="12" md="6">
@@ -46,16 +48,34 @@
                   v-model="document.ubicacion"
                   outlined
                   dense
+                  hide-details
                 />
               </v-col>
               <v-col cols="12" md="3">
-                <v-text-field
-                  label="Fecha de Envío"
-                  v-model="document.fechaEnvio"
-                  outlined
-                  type="date"
-                  dense
-                />
+                <v-menu
+                  v-model="menuFecha"
+                  :close-on-content-click="false"
+                  transition="scale-transition"
+                  offset-y
+                  min-width="auto"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="document.fechaEnvio"
+                      label="Fecha"
+                      append-icon="mdi-calendar"
+                      color="secondaryColor"
+                      v-bind="attrs"
+                      v-on="on"
+                      readonly
+                      clearable
+                      outlined
+                      dense
+                      hide-details
+                    />
+                  </template>
+                  <v-date-picker color="secondaryColor" v-model="document.fechaEnvio" @input="menuFecha = false"></v-date-picker>
+                </v-menu>
               </v-col>
               <v-col cols="6" md="3">
                 <v-text-field
@@ -63,6 +83,7 @@
                   v-model="document.placaTracto"
                   outlined
                   dense
+                  hide-details
                 />
               </v-col>
               <v-col cols="6" md="3">
@@ -71,6 +92,7 @@
                   v-model="document.placaCarreta"
                   outlined
                   dense
+                  hide-details
                 />
               </v-col>
               <v-col cols="12" md="6">
@@ -85,6 +107,7 @@
                   dense
                   clearable
                   return-object
+                  hide-details
                 >
                   <template #append-item>
                     <v-divider />
@@ -97,7 +120,44 @@
                   </template>
                 </v-autocomplete>
               </v-col>
-              <v-col v-if="document.fechaRepuesta" cols="12" md="6">
+              <v-col cols="12" md="6">
+                <v-text-field
+                  label="Condición"
+                  v-model="document.condition"
+                  outlined
+                  dense
+                  hide-details
+                />
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field
+                  label="Líder de Convoy"
+                  v-model="document.leaderConvoy"
+                  outlined
+                  dense
+                  hide-details
+                />
+              </v-col>
+              <v-col cols="12" md="12">
+                <v-textarea
+                  label="Descripcion (¿Qué pasó?)"
+                  v-model="document.detail"
+                  outlined
+                  dense
+                  rows="3"
+                  hide-details
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-switch
+                  v-model="noSolicitado"
+                  label="No Solicitado"
+                  color="primary"
+                  hide-details
+                  dense
+                ></v-switch>
+              </v-col>
+              <!-- <v-col cols="12" md="6">
                 <v-select
                   :items="['En Proceso', 'Completado', 'No Solicitado']"
                   label="Estado"
@@ -106,7 +166,7 @@
                   dense
                   clearable
                 />
-              </v-col>
+              </v-col> -->
             </v-row>
             <v-row>
               <v-col cols="12" md="12">
@@ -114,22 +174,56 @@
                 <v-divider></v-divider>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field
-                label="Fecha Solicitud de Requerimientos"
-                v-model="document.fechaSolicitud"
-                outlined
-                type="date"
-                dense
-              />
+                <v-menu
+                  v-model="menuFecha2"
+                  :close-on-content-click="false"
+                  transition="scale-transition"
+                  offset-y
+                  min-width="auto"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="document.fechaSolicitud"
+                      label="Fecha de Solicitud"
+                      append-icon="mdi-calendar"
+                      color="secondaryColor"
+                      v-bind="attrs"
+                      v-on="on"
+                      readonly
+                      clearable
+                      outlined
+                      dense
+                      hide-details
+                    />
+                  </template>
+                  <v-date-picker color="secondaryColor" v-model="document.fechaSolicitud" @input="menuFecha2 = false"></v-date-picker>
+                </v-menu>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field
-                  label="Fecha de Respuesta"
-                  v-model="document.fechaRepuesta"
-                  outlined
-                  type="date"
-                  dense
-                />
+                <v-menu
+                  v-model="menuFecha3"
+                  :close-on-content-click="false"
+                  transition="scale-transition"
+                  offset-y
+                  min-width="auto"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="document.fechaRepuesta"
+                      label="Fecha de Respuesta"
+                      append-icon="mdi-calendar"
+                      color="secondaryColor"
+                      v-bind="attrs"
+                      v-on="on"
+                      readonly
+                      clearable
+                      outlined
+                      dense
+                      hide-details
+                    />
+                  </template>
+                  <v-date-picker color="secondaryColor" v-model="document.fechaRepuesta" @input="menuFecha3 = false"></v-date-picker>
+                </v-menu>
               </v-col>
               <v-col v-if="document.fechaRepuesta" cols="12" md="6">
                 <v-select
@@ -154,10 +248,10 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="saveDocument" :loading="loading">
+        <v-btn color="primaryColor" text @click="saveDocument" :loading="loading">
           {{ this.document.id === null ? 'Guardar' : 'Editar' }}
         </v-btn>
-        <v-btn color="grey" text @click="close">Cancelar</v-btn>
+        <v-btn color="neutralColor" text @click="close">Cancelar</v-btn>
       </v-card-actions>
       <!-- addEmployee -->
         <add-employee
@@ -195,6 +289,9 @@ export default {
         fechaEnvio: '',
         fechaRepuesta: '',
         fechaSolicitud: '',
+        detail: '',
+        leaderConvoy: '',
+        condition: '',
         operador: '',
         link: '',
         estado: '',
@@ -209,6 +306,10 @@ export default {
       employees : [],
       operations : [],
       dialogEmployee: false,
+      menuFecha: false,
+      menuFecha2: false,
+      menuFecha3: false,
+      noSolicitado: false,
       currentEmployee: {  // Added property
         name: '',
         workstation: '',
@@ -232,6 +333,9 @@ export default {
             fechaEnvio: '',
             fechaRepuesta: '',
             fechaSolicitud: '',
+            detail: '',
+            leaderConvoy: '',
+            condition: '',
             operador: '',
             link: '',
             estado: '',
@@ -260,7 +364,17 @@ export default {
   methods: {
     async saveDocument() {
       try {
-        this.loading= true
+        this.loading = true;
+        let estado = 'Pendiente';
+        if (this.document.fechaSolicitud) {
+          estado = 'En Proceso';
+        }
+        if (this.document.fechaRepuesta) {
+          estado = 'Completado';
+        }
+        if (this.noSolicitado) {
+          estado = 'No Solicitado';
+        }
         if (this.document.id) {
           await updateDocument(this.document.id, {
             numero: this.document.numero,
@@ -269,14 +383,17 @@ export default {
             fechaEnvio: this.document.fechaEnvio,
             ubicacion: this.document.ubicacion,
             placaTracto: this.document.placaTracto,
-            placaCarreta:this.document.placaCarreta,
+            placaCarreta: this.document.placaCarreta,
             fechaRepuesta: this.document.fechaRepuesta,
             fechaSolicitud: this.document.fechaSolicitud,
+            detail: this.document.detail,
+            leaderConvoy: this.document.leaderConvoy,
+            condition: this.document.condition,
             operador: this.document.operador,
             link: this.document.link,
-            estado: this.document.estado,
+            estado: estado,
             employee: this.document.employee
-          })
+          });
         } else {
           await createDocument({
             numero: this.document.numero,
@@ -285,20 +402,24 @@ export default {
             fechaEnvio: this.document.fechaEnvio,
             ubicacion: this.document.ubicacion,
             placaTracto: this.document.placaTracto,
-            placaCarreta:this.document.placaCarreta,
+            placaCarreta: this.document.placaCarreta,
             fechaRepuesta: this.document.fechaRepuesta,
             fechaSolicitud: this.document.fechaSolicitud,
+            detail: this.document.detail,
+            leaderConvoy: this.document.leaderConvoy,
+            condition: this.document.condition,
             operador: this.document.operador,
             link: this.document.link,
-            estado: 'Pendiente',
+            estado: estado, // Usamos el estado calculado
             employee: this.document.employee
-          })
+          });
         }
-        this.$emit('saveDocument')
-        this.close()
-        this.loading= false
+        this.$emit('saveDocument');
+        this.close();
+        this.loading = false;
       } catch (error) {
-        console.error('Error al guardar documento:', error)
+        console.error('Error al guardar documento:', error);
+        this.loading = false;
       }
     },
     OpenDialogEmployee(){
@@ -346,6 +467,9 @@ export default {
         fechaEnvio: '',
         fechaRepuesta: '',
         fechaSolicitud: '',
+        detail: '',
+        leaderConvoy: '',
+        condition: '',
         operador: '',
         link: '',
         estado: '',

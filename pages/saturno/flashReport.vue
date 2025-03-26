@@ -13,6 +13,18 @@
         </v-col>
         <v-col cols="12" md="4">
           <v-text-field
+            v-model="searchQueryGeneral"
+            color="secondaryColor"
+            label="Buscar..."
+            append-icon="mdi-magnify"
+            clearable
+            outlined
+            dense
+            hide-details
+          />
+        </v-col>
+        <!-- <v-col cols="12" md="4">
+          <v-text-field
             v-model="searchQuery"
             color="secondaryColor"
             label="Buscar N° Flash Report"
@@ -22,7 +34,7 @@
             dense
             hide-details
           />
-        </v-col>
+        </v-col> -->
         <v-col cols="12" md="4">
           <v-autocomplete
             v-model="selectedEstado"
@@ -112,8 +124,30 @@
             >{{ item.estado }}</v-chip>
         </template>
         <template v-slot:[`item.acciones`]="{ item }">
-          <v-icon small color="secondaryColor" @click="editDocument(item)">mdi-pencil</v-icon>
-          <v-icon small color="dangerColor" @click="deleteDocument(item.id)">mdi-delete</v-icon>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon small color="secondaryColor" @click="editDocument(item)" v-bind="attrs" v-on="on">
+                mdi-pencil
+              </v-icon>
+            </template>
+            <span>Editar</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon small color="dangerColor" @click="deleteDocument(item.id)" v-bind="attrs" v-on="on" >
+                mdi-delete
+              </v-icon>
+            </template>
+            <span>Eliminar</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon color="dangerColor" @click="generatePDF(item)" v-bind="attrs" v-on="on">
+                mdi-file-pdf-box
+              </v-icon>
+            </template>
+            <span>Descargar PDF</span>
+          </v-tooltip>
         </template>
       </v-data-table>
     </v-card-text>
@@ -127,10 +161,13 @@
 </template>
 
 <script>
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import Swal from "sweetalert2";
 import addDocument from '../../components/saturno/addFlashR.vue';
 import { getDocuments, deleteDocument } from '../../services/documentServices';
 import { getOperationMines } from '../../services/operationMineServices';
+
 
 export default {
   name: 'Documents',
@@ -147,7 +184,7 @@ export default {
         { text: 'Operación', value: 'operacion' },
         { text: 'Evento', value: 'evento' },
         // { text: 'Fecha de Repuesta', value: 'fechaRepuesta' },
-        { text: 'Operador CC', value: 'operador' },
+        // { text: 'Operador CC', value: 'operador' },
         // { text: 'Fecha Solicitud', value: 'fechaSolicitud' },
         // { text: 'Link', value: 'link' },
         { text: 'Estado', value: 'estado' },
@@ -160,7 +197,8 @@ export default {
       selectedEstado: null,
       selectedOperacion: null,
       selectedDocument: null,
-      searchQuery: null,
+      // searchQuery: null,
+       searchQueryGeneral: null,
       fechaFiltro: this.getFechaHoy()
     };
   },
@@ -169,9 +207,15 @@ export default {
       return this.documents.filter(doc => {
         const estadoMatch = !this.selectedEstado || doc.estado === this.selectedEstado;
         const operacionMatch = !this.selectedOperacion || doc.operacion === this.selectedOperacion;
-        const searchMatch = !this.searchQuery || doc.numero.toString().includes(this.searchQuery);
+        // const searchMatch = !this.searchQuery || doc.numero.toString().includes(this.searchQuery);
         const fechaMatch = !this.fechaFiltro || doc.fechaEnvio === this.fechaFiltro;
-        return estadoMatch && operacionMatch && searchMatch && fechaMatch;
+        // Búsqueda general (si hay searchQueryGeneral)
+        const generalSearchMatch = !this.searchQueryGeneral ||
+        Object.values(doc).some(value => {
+          if (value === null || value === undefined) return false;
+          return value.toString().toLowerCase().includes(this.searchQueryGeneral.toLowerCase());
+        });
+        return estadoMatch && operacionMatch && fechaMatch && generalSearchMatch;
       });
     }
   },
@@ -186,20 +230,105 @@ export default {
         numero: '',
         operacion: '',
         evento: '',
-        placaTracto: '',
-        placaCarreta:'',
         ubicacion: '',
-        fechaEnvio: '',
-        fechaRepuesta: '',
-        fechaSolicitud: '',
+        fechaEnvio: this.getFechaHoy(),
         operador: '',
-        link: '',
-        estado: ''
+        placaTracto: '',
+        condicion: '',
+        descripcion: '',
+        acciones: '',
+        elaboradoPor: '',
+        estado: 'Pendiente'
       }
       this.dialogComponent = true
     },
     exportExcel(){
       alert('Se esta trabajando...')
+    },
+    async generatePDF(item) {
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      const margin = 10;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const centerX = pageWidth / 2;
+      // **LOGO**
+      // const imgData = 'ruta_del_logo.png';
+      // doc.addImage(imgData, 'PNG', margin, 10, 30, 15);
+      // **TÍTULO**
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('FLASH REPORT', centerX, 20, { align: 'center' });
+      // **TABLA DE INFORMACIÓN GENERAL**
+      autoTable(doc, {
+        startY: 30,
+        head: [['INFORMACIÓN GENERAL']],
+        body: [
+          ['TIPO DE DOCUMENTO:', 'FORMATO', `CÓDIGO: ${item.numero || 'N/A'}`],
+          ['NOMBRE DEL DOCUMENTO:', 'FLASH REPORT', `FECHA: ${item.fechaEnvio || '----/--/--'}`],
+          ['Ubicación:', item.ubicacion || 'N/A', `Evento: ${item.evento || 'N/A'}`],
+          ['Fecha y hora:', item.fechaEnvio || 'N/A', `Operación: ${item.operacion || 'N/A'}`],
+          ['Conductor:', item.operador || 'N/A', `Placas: ${item.placaTracto || 'N/A'}`],
+          ['Líder de convoy:', 'NO APLICA', `Condición: ${item.condicion || 'N/A'}`]
+        ],
+        theme: 'grid',
+        headStyles: {
+          fillColor: [41, 115, 77],
+          textColor: 255,
+          fontStyle: 'bold'
+        },
+        styles: {
+          fontSize: 10,
+          cellPadding: 3
+        },
+        columnStyles: {
+          0: { fontStyle: 'bold', cellWidth: 50 },
+          1: { cellWidth: 50 },
+          2: { cellWidth: 50 }
+        }
+      });
+      let nextY = doc.lastAutoTable.finalY + 5;
+      // **DESCRIPCIÓN**
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Descripción (¿qué ocurrió?):', margin, nextY);
+      nextY += 6;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text(
+        `Se recibió la llamada del operador informando que tuvo un incidente mientras realizaba maniobras de retroceso en ${item.ubicacion}, 
+        generando daños en la puerta del módulo de SSHH del depósito. Se adjunta el presente reporte para los fines correspondientes.`,
+        margin,
+        nextY,
+        { maxWidth: 180 }
+      );
+      nextY += 15;
+      // **UBICACIÓN Y EVIDENCIAS**
+      doc.setFont('helvetica', 'bold');
+      doc.text('Ubicación y evidencias fotográfica.', margin, nextY);
+      nextY += 6;
+      // **Acciones Inmediatas**
+      autoTable(doc, {
+        startY: nextY,
+        head: [['Acciones Inmediatas']],
+        body: [
+          ['• Se procede a realizar la difusión del evento'],
+          ['• Se realizan las llamadas correspondientes a las áreas encargadas']
+        ],
+        theme: 'grid',
+        styles: { fontSize: 10, cellPadding: 3 },
+        headStyles: { fillColor: [41, 115, 77], textColor: 255, fontStyle: 'bold' }
+      });
+      nextY = doc.lastAutoTable.finalY + 5;
+      // **PIE DE PÁGINA**
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`Flash Report. Elaborado por: ${item.autor || 'N/A'}`, margin, nextY);
+      doc.text(item.fechaEnvio || '----/--/--', pageWidth - margin - 30, nextY);
+      // **GUARDAR PDF**
+      doc.save(`FlashReport_${item.numero || 'N'}_${item.fechaEnvio || ''}.pdf`);
     },
     getFechaHoy() {
       const hoy = new Date();
