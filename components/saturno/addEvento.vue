@@ -29,25 +29,51 @@
                     hide-details
                   />
                 </v-col>
-                <v-col cols="6">
-                  <v-label>Placa:</v-label>
+                <v-col cols="6" md="3">
+                  <v-label>Placa Tracto:</v-label>
                   <v-text-field
-                    v-model="event.placa"
+                    v-model="event.placaTracto"
                     outlined
                     dense
                     hide-details
                   />
                 </v-col>
-                <v-col cols="6">
-                  <v-label>Fecha:</v-label>
+                <v-col cols="6" md="3">
+                  <v-label>Placa Careta:</v-label>
                   <v-text-field
-                    v-model="event.fecha"
-                    outlined type="date"
+                    v-model="event.placaCarreta"
+                    outlined
                     dense
                     hide-details
                   />
                 </v-col>
-                <v-col cols="6">
+                <v-col cols="12" md="3">
+                  <v-label>Fecha:</v-label>
+                  <v-menu
+                    v-model="menuFecha"
+                    :close-on-content-click="false"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="auto"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field
+                        v-model="event.fecha"
+                        append-icon="mdi-calendar"
+                        color="secondaryColor"
+                        v-bind="attrs"
+                        v-on="on"
+                        readonly
+                        clearable
+                        outlined
+                        dense
+                        hide-details
+                      />
+                    </template>
+                    <v-date-picker color="secondaryColor" v-model="event.fecha" @input="menuFecha = false"></v-date-picker>
+                  </v-menu>
+                </v-col>
+                <v-col cols="3">
                   <v-label>Hora:</v-label>
                   <v-text-field
                     v-model="event.hora"
@@ -55,28 +81,6 @@
                     outlined
                     dense
                     hide-details
-                  />
-                </v-col>
-                <v-col cols="6">
-                  <v-label>Estado:</v-label>
-                  <v-select
-                    :items="['Cargado', 'Vacío']"
-                    v-model="event.estado"
-                    outlined
-                    dense
-                    hide-details
-                    clearable
-                  />
-                </v-col>
-                <v-col cols="6">
-                  <v-label>Cámaras:</v-label>
-                  <v-select
-                    :items="['Si Cuenta', 'No Cuenta']"
-                    v-model="event.camaras"
-                    outlined
-                    dense
-                    hide-details
-                    clearable
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -103,6 +107,28 @@
                     </template>
                   </v-autocomplete>
                 </v-col>
+                <v-col cols="3">
+                  <v-label>Estado:</v-label>
+                  <v-select
+                    :items="['Cargado', 'Vacío']"
+                    v-model="event.estado"
+                    outlined
+                    dense
+                    hide-details
+                    clearable
+                  />
+                </v-col>
+                <v-col cols="3">
+                  <v-label>Cámaras:</v-label>
+                  <v-select
+                    :items="['Si Cuenta', 'No Cuenta']"
+                    v-model="event.camaras"
+                    outlined
+                    dense
+                    hide-details
+                    clearable
+                  />
+                </v-col>
                 <v-col cols="6">
                   <v-label>Operaciòn:</v-label>
                   <v-autocomplete
@@ -110,7 +136,6 @@
                     color="secondaryColor"
                     :items="operations"
                     item-text="name"
-                    item-value="id"
                     clearable
                     outlined
                     dense
@@ -169,7 +194,8 @@ export default {
         id: null,
         evento: '',
         nivel: '',
-        placa: '',
+        placaTracto: '',
+        placaCarreta: '',
         fecha: '',
         hora: '',
         estado: '',
@@ -183,11 +209,12 @@ export default {
   },
   data() {
     return {
+      dialogEmployee: false,
+      menuFecha: false,
       loading: false,
-      event: { ...this.events },
       employees : [],
       operations : [],
-      dialogEmployee: false,
+      event: { ...this.events },
     }
   },
   watch: {
@@ -199,7 +226,8 @@ export default {
             id: null,
             evento: '',
             nivel: '',
-            placa: '',
+            placaTracto: '',
+            placaCarreta: '',
             fecha: '',
             hora: '',
             estado: '',
@@ -237,7 +265,8 @@ export default {
           await updateEvent(this.event.id, {
             evento: this.event.evento,
             nivel: this.event.nivel,
-            placa: this.event.placa,
+            placaTracto: this.event.placaTracto,
+            placaCarreta: this.event.placaCarreta,
             fecha: this.event.fecha,
             hora: this.event.hora,
             estado: this.event.estado,
@@ -251,7 +280,8 @@ export default {
           await createEvent({
             evento: this.event.evento,
             nivel: this.event.nivel,
-            placa: this.event.placa,
+            placaTracto: this.event.placaTracto,
+            placaCarreta: this.event.placaCarreta,
             fecha: this.event.fecha,
             hora: this.event.hora,
             estado: this.event.estado,
@@ -307,7 +337,8 @@ export default {
         id: null,
         evento: '',
         nivel: '',
-        placa: '',
+        placaTracto: '',
+        placaCarreta: '',
         fecha: '',
         hora: '',
         estado: '',

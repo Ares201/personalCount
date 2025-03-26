@@ -18,9 +18,9 @@
         </v-col>
         <v-col cols="12" md="4">
           <v-text-field
-            v-model="searchQuery"
+            v-model="searchQueryGeneral"
             color="secondaryColor"
-            label="Buscar Evento"
+            label="Buscar..."
             append-icon="mdi-magnify"
             clearable
             outlined
@@ -36,7 +36,6 @@
             append-icon="mdi-mine"
             label="Operacion"
             item-text="name"
-            item-value="id"
             clearable
             outlined
             dense
@@ -134,7 +133,7 @@
                     <h3 class="mb-6"> 📢 CENTRO CONTROL INFORMA</h3>
                     <div><strong>Evento:</strong> {{ event.evento }}</div>
                     <div><strong>Nivel:</strong> {{ event.nivel }}</div>
-                    <div><strong>Placa:</strong> {{ event.placa }}</div>
+                    <div><strong>Placa:</strong> {{ event.placaTracto }} / {{ event.placaCarreta }}</div>
                     <div><strong>Fecha:</strong> {{ event.fecha }}</div>
                     <div><strong>Hora:</strong> {{ event.hora }}</div>
                     <div><strong>Estado:</strong> {{ event.estado }}</div>
@@ -179,7 +178,7 @@ export default {
       headers: [
         { text: '#', value: 'index', sortable: false },
         { text: 'Evento', value: 'evento' },
-        { text: 'Placa', value: 'placa' },
+        { text: 'Placa', value: 'placaTracto' },
         { text: 'Fecha', value: 'fecha' },
         { text: 'Hora', value: 'hora' },
         { text: 'Estado', value: 'estado' },
@@ -194,7 +193,7 @@ export default {
       events: [],
       selectedOperacion: null,
       selectedEvent: null,
-      searchQuery: null,
+      searchQueryGeneral: null,
       fechaFiltro: this.getFechaHoy()
     };
   },
@@ -202,9 +201,14 @@ export default {
     filteredEvents() {
       return this.events.filter(doc => {
         const operacionMatch = !this.selectedOperacion || doc.contrato === this.selectedOperacion;
-        const searchMatch = !this.searchQuery || doc.evento.toString().includes(this.searchQuery);
+         // Búsqueda general (si hay searchQueryGeneral)
+        const generalSearchMatch = !this.searchQueryGeneral ||
+          Object.values(doc).some(value => {
+            if (value === null || value === undefined) return false;
+            return value.toString().toLowerCase().includes(this.searchQueryGeneral.toLowerCase());
+          });
         const fechaMatch = !this.fechaFiltro || doc.fecha === this.fechaFiltro;
-        return operacionMatch && searchMatch && fechaMatch;
+        return operacionMatch && generalSearchMatch && fechaMatch;
       });
     }
   },
@@ -219,7 +223,7 @@ export default {
 
       *Evento:* ${event.evento}
       *Nivel:* ${event.nivel}🟡
-      *Placa:* ${event.placa}
+      *Placa:* ${event.placaTracto} / ${event.placaCarreta}
       *Fecha:* ${event.fecha}
       *Hora:* ${event.hora}
       *Estado:* ${event.estado}
@@ -243,7 +247,8 @@ export default {
         id: null,
         evento: '',
         nivel: '',
-        placa: '',
+        placaTracto: '',
+        placaCarreta: '',
         fecha: '',
         hora: '',
         estado: '',

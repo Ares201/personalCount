@@ -8,6 +8,20 @@
       <v-col cols="12" md="6">
         <BarChart ref="barChart" :chart-data="chartData" :options="chartOptions" />
       </v-col>
+      <v-col cols="12" md="6">
+        <v-card outlined>
+          <v-card-title class="text-center justify-center">Registros por Movimiento</v-card-title>
+          <v-list>
+            <v-list-item v-for="(monto, tipo) in countByOperacion" :key="tipo">
+              <v-list-item-content>
+                <v-list-item-title>
+                  °{{ tipo }} - S/.{{ monto }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-card>
+      </v-col>
     </v-row>
   </v-card>
 </template>
@@ -23,6 +37,7 @@ export default {
   data() {
     return {
       boxs: [],
+      countByOperacion: {},
       chartData: {
         datasets: [
           {
@@ -46,6 +61,14 @@ export default {
       try {
         const response = await getBoxs()
         this.boxs = response
+        this.countByOperacion = this.boxs.reduce((acc, doc) => {
+          if (doc.tipo && (doc.tipo === "Ingreso" || doc.tipo === "Salida")) {
+            acc[doc.tipo] = (acc[doc.tipo] || 0) + doc.monto;
+          }
+          return acc;
+        }, {});
+        // Calcular el total (INGRESO - SALIDA)
+        this.countByOperacion["Total"] = (this.countByOperacion["Ingreso"] || 0) - (this.countByOperacion["Salida"] || 0);
         // Total de Ingresos
         const totalIngresos = this.boxs
         .filter(item => item.tipo === 'Ingreso')
