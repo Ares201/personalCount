@@ -289,7 +289,7 @@ export default {
         fechaEnvio: '',
         fechaRepuesta: '',
         fechaSolicitud: '',
-        detail: '',
+        detail: null,
         leaderConvoy: '',
         condition: '',
         operador: '',
@@ -333,13 +333,13 @@ export default {
             fechaEnvio: '',
             fechaRepuesta: '',
             fechaSolicitud: '',
-            detail: '',
+            detail: null,
             leaderConvoy: '',
             condition: '',
             operador: '',
             link: '',
             estado: '',
-            employee: ''
+            employee: null
           }
         }
       },
@@ -366,59 +366,41 @@ export default {
       try {
         this.loading = true;
         let estado = 'Pendiente';
-        if (this.document.fechaSolicitud) {
-          estado = 'En Proceso';
-        }
-        if (this.document.fechaRepuesta) {
-          estado = 'Completado';
-        }
-        if (this.noSolicitado) {
-          estado = 'No Solicitado';
-        }
+        if (this.document.fechaSolicitud) estado = 'En Proceso';
+        if (this.document.fechaRepuesta) estado = 'Completado';
+        if (this.noSolicitado) estado = 'No Solicitado';
+
+        const docData = {
+          numero: this.document.numero || '',
+          operacion: this.document.operacion || '',
+          evento: this.document.evento || '',
+          fechaEnvio: this.document.fechaEnvio || null,
+          ubicacion: this.document.ubicacion || '',
+          placaTracto: this.document.placaTracto || '',
+          placaCarreta: this.document.placaCarreta || '',
+          fechaRepuesta: this.document.fechaRepuesta || null,
+          fechaSolicitud: this.document.fechaSolicitud || null,
+          detail: this.document.detail || '', // Asegura que no sea undefined
+          leaderConvoy: this.document.leaderConvoy || '',
+          condition: this.document.condition || '',
+          operador: this.document.operador || '',
+          link: this.document.link || '',
+          estado: estado,
+          employee: this.document.employee || null, // Asegura que no sea undefined
+        };
+
         if (this.document.id) {
-          await updateDocument(this.document.id, {
-            numero: this.document.numero,
-            operacion: this.document.operacion,
-            evento: this.document.evento,
-            fechaEnvio: this.document.fechaEnvio,
-            ubicacion: this.document.ubicacion,
-            placaTracto: this.document.placaTracto,
-            placaCarreta: this.document.placaCarreta,
-            fechaRepuesta: this.document.fechaRepuesta,
-            fechaSolicitud: this.document.fechaSolicitud,
-            detail: this.document.detail,
-            leaderConvoy: this.document.leaderConvoy,
-            condition: this.document.condition,
-            operador: this.document.operador,
-            link: this.document.link,
-            estado: estado,
-            employee: this.document.employee
-          });
+          await updateDocument(this.document.id, docData);
         } else {
-          await createDocument({
-            numero: this.document.numero,
-            operacion: this.document.operacion,
-            evento: this.document.evento,
-            fechaEnvio: this.document.fechaEnvio,
-            ubicacion: this.document.ubicacion,
-            placaTracto: this.document.placaTracto,
-            placaCarreta: this.document.placaCarreta,
-            fechaRepuesta: this.document.fechaRepuesta,
-            fechaSolicitud: this.document.fechaSolicitud,
-            detail: this.document.detail,
-            leaderConvoy: this.document.leaderConvoy,
-            condition: this.document.condition,
-            operador: this.document.operador,
-            link: this.document.link,
-            estado: estado, // Usamos el estado calculado
-            employee: this.document.employee
-          });
+          await createDocument(docData);
         }
+
         this.$emit('saveDocument');
         this.close();
-        this.loading = false;
       } catch (error) {
         console.error('Error al guardar documento:', error);
+        Swal.fire('Error', 'No se pudo guardar el documento', 'error');
+      } finally {
         this.loading = false;
       }
     },
@@ -467,13 +449,13 @@ export default {
         fechaEnvio: '',
         fechaRepuesta: '',
         fechaSolicitud: '',
-        detail: '',
+        detail: null,
         leaderConvoy: '',
         condition: '',
         operador: '',
         link: '',
         estado: '',
-        employee: ''
+        employee: null
       }
     },
   }
