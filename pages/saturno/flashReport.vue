@@ -106,6 +106,7 @@
         :items="filteredDocuments"
         item-value="id"
         dense
+        mobile-breakpoint="0"
       >
         <template v-slot:[`item.index`]="{ index }">
           {{ index + 1 }}
@@ -198,7 +199,7 @@ export default {
       selectedOperacion: null,
       selectedDocument: null,
       // searchQuery: null,
-       searchQueryGeneral: null,
+      searchQueryGeneral: null,
       fechaFiltro: this.getFechaHoy()
     };
   },

@@ -12,6 +12,7 @@
               <v-col cols="12" md="3">
                 <v-text-field
                   label="N° Flash Report"
+                  class="custom-autocomplete"
                   v-model="document.numero"
                   outlined
                   dense
@@ -21,6 +22,7 @@
               <v-col cols="12" md="9">
                 <v-text-field
                   label="Evento"
+                  class="custom-autocomplete"
                   v-model="document.evento"
                   outlined
                   dense
@@ -34,17 +36,19 @@
                   :items="operations"
                   item-text="name"
                   label="Operacion"
+                  class="custom-autocomplete"
                   clearable
                   outlined
                   dense
                   hide-no-data
                   hide-selected
                   hide-details
-                ></v-autocomplete>
+                />
               </v-col>
               <v-col cols="6" md="3">
                 <v-text-field
                   label="Ubicacion"
+                  class="custom-autocomplete"
                   v-model="document.ubicacion"
                   outlined
                   dense
@@ -65,6 +69,7 @@
                       label="Fecha"
                       append-icon="mdi-calendar"
                       color="secondaryColor"
+                      class="custom-autocomplete"
                       v-bind="attrs"
                       v-on="on"
                       readonly
@@ -80,6 +85,7 @@
               <v-col cols="6" md="3">
                 <v-text-field
                   label="Placa Tracto"
+                  class="custom-autocomplete"
                   v-model="document.placaTracto"
                   outlined
                   dense
@@ -89,6 +95,7 @@
               <v-col cols="6" md="3">
                 <v-text-field
                   label="Placa Carreta"
+                  class="custom-autocomplete"
                   v-model="document.placaCarreta"
                   outlined
                   dense
@@ -103,6 +110,7 @@
                   item-value="id"
                   label="Empleado"
                   color="secondaryColor"
+                  class="custom-autocomplete"
                   outlined
                   dense
                   clearable
@@ -123,6 +131,7 @@
               <v-col cols="12" md="6">
                 <v-text-field
                   label="Condición"
+                  class="custom-autocomplete"
                   v-model="document.condition"
                   outlined
                   dense
@@ -132,6 +141,7 @@
               <v-col cols="12" md="6">
                 <v-text-field
                   label="Líder de Convoy"
+                  class="custom-autocomplete"
                   v-model="document.leaderConvoy"
                   outlined
                   dense
@@ -141,6 +151,7 @@
               <v-col cols="12" md="12">
                 <v-textarea
                   label="Descripcion (¿Qué pasó?)"
+                  class="custom-autocomplete"
                   v-model="document.detail"
                   outlined
                   dense
@@ -153,6 +164,7 @@
                   v-model="noSolicitado"
                   label="No Solicitado"
                   color="primary"
+                  class="custom-autocomplete"
                   hide-details
                   dense
                 ></v-switch>
@@ -187,6 +199,7 @@
                       label="Fecha de Solicitud"
                       append-icon="mdi-calendar"
                       color="secondaryColor"
+                      class="custom-autocomplete"
                       v-bind="attrs"
                       v-on="on"
                       readonly
@@ -213,6 +226,7 @@
                       label="Fecha de Respuesta"
                       append-icon="mdi-calendar"
                       color="secondaryColor"
+                      class="custom-autocomplete"
                       v-bind="attrs"
                       v-on="on"
                       readonly
@@ -229,6 +243,7 @@
                 <v-select
                   :items="['Giancarlo Cervera', 'Paolo Limaco', 'Jair Macazana', 'Ronal Zevallos', 'Victor Pinto']"
                   label="Operador CC"
+                  class="custom-autocomplete"
                   v-model="document.operador"
                   outlined
                   dense
@@ -238,6 +253,7 @@
               <v-col v-if="document.fechaRepuesta" cols="12" md="6">
                 <v-text-field
                 label="Link"
+                class="custom-autocomplete"
                 v-model="document.link"
                 outlined
                 dense />
@@ -248,7 +264,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primaryColor" text @click="saveDocument" :loading="loading">
+        <v-btn color="primaryColor" text @click="saveDocument">
           {{ this.document.id === null ? 'Guardar' : 'Editar' }}
         </v-btn>
         <v-btn color="neutralColor" text @click="close">Cancelar</v-btn>
@@ -364,7 +380,6 @@ export default {
   methods: {
     async saveDocument() {
       try {
-        this.loading = true;
         let estado = 'Pendiente';
         if (this.document.fechaSolicitud) estado = 'En Proceso';
         if (this.document.fechaRepuesta) estado = 'Completado';
@@ -461,3 +476,8 @@ export default {
   }
 }
 </script>
+<style scoped>
+.custom-autocomplete ::v-deep(.v-input__control) {
+  border-radius: 10px;
+}
+</style>
