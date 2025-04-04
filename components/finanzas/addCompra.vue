@@ -1,126 +1,172 @@
 <template>
   <v-dialog v-model="dialog" max-width="550px">
     <v-card>
-      <v-card-title>
+      <v-card-title class="justify-center mb-2">
         <span class="text-h6">{{ formTitle }}</span>
       </v-card-title>
+      <v-divider class="mb-4"></v-divider>
       <v-card-text>
         <v-form ref="form">
-          <v-row dense>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                label="Fecha"
-                v-model="compra.fecha"
-                outlined
-                type="date"
-              />
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="compra.concepto"
-                label="Concepto"
-                outlined
-              />
-            </v-col>
-            <v-col cols="12" md="6">
-              <v-text-field
-                v-model="compra.descripcion"
-                label="Descripción"
-                outlined
-              />
-            </v-col>
-          </v-row>
-          <v-row dense>
-            <v-col cols="7" md="8">
-              <v-btn color="success darken-1" icon outlined @click="dialogDetail = true">
-                <v-icon>mdi-plus</v-icon>
-              </v-btn>
-            </v-col>
-            <v-spacer/>
-            <v-col cols="5" md="4">
-              <v-chip
-                class="ma-2"
-                color="orange"
-                text-color="white"
-              >
-                {{ totalDetail ? 'Total: S/. ' + totalDetail : 'Total: S/. 0' }}
-              </v-chip>
-            </v-col>
-          </v-row>
-          <v-row class="m-0">
-            <v-col cols="12">
-              <div v-for="(detail, index) in detailBox" :key="index" class="mb-4 px-2">
-                <v-card class="pa-3" outlined>
-                  <v-row dense>
+          <v-container>
+            <v-row dense>
+              <v-col cols="12" sm="6">
+                <v-menu
+                  v-model="menuFecha"
+                  :close-on-content-click="false"
+                  transition="scale-transition"
+                  offset-y
+                  min-width="auto"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="compra.fecha"
+                      label="Fecha"
+                      append-icon="mdi-calendar"
+                      color="secondaryColor"
+                      class="custom-autocomplete"
+                      v-bind="attrs"
+                      v-on="on"
+                      readonly
+                      clearable
+                      outlined
+                      dense
+                      hide-details
+                    />
+                  </template>
+                  <v-date-picker color="secondaryColor" v-model="compra.fecha" @input="menuFecha = false"></v-date-picker>
+                </v-menu>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="compra.concepto"
+                  label="Concepto"
+                  class="custom-autocomplete"
+                  outlined
+                  dense
+                  hide-details
+                />
+              </v-col>
+              <v-col cols="12" md="12">
+                <v-text-field
+                  v-model="compra.descripcion"
+                  label="Descripción"
+                  class="custom-autocomplete"
+                  outlined
+                  dense
+                  hide-details
+                />
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" md="12" class="d-flex justify-space-between align-center">
+                <v-btn color="success darken-1" icon outlined @click="dialogDetail = true">
+                  <v-icon>mdi-plus</v-icon>
+                </v-btn>
+                <v-chip
+                  class="ma-1"
+                  color="primaryColor"
+                  text-color="white"
+                >
+                  {{ totalDetail ? 'Total: S/. ' + totalDetail : 'Total: S/. 0' }}
+                </v-chip>
+              </v-col>
+            </v-row>
+            <v-row class="m-0">
+              <v-col cols="12">
+                <v-data-table
+                  :headers="headers"
+                  :items="detailBox"
+                  item-value="id"
+                  dense
+                  mobile-breakpoint="0"
+                  row
+                >
+                  <template v-slot:[`item.index`]="{ index }">
                     {{ index + 1 }}.-
-                    <v-col cols="4" md="5">
-                      <span>{{ detail.detalle }}</span>
-                    </v-col>
-                    <v-col cols="3" md="3">
-                      <span>S/.{{ detail.monto }}</span>
-                    </v-col>
-                    <v-col cols="5" md="3">
-                      <v-row dense>
-                        <v-col cols="3" md="3" v-if="detail.showActions">
-                          <v-btn icon @click="removeDetail(index)">
-                            <v-icon color="red">mdi-delete</v-icon>
-                          </v-btn>
-                        </v-col>
-                        <v-col cols="3" md="3" v-if="detail.showActions">
-                          <v-btn icon @click="editDetail(index)">
-                            <v-icon color="primary">mdi-pencil</v-icon>
-                          </v-btn>
-                        </v-col>
-                        <v-col cols="3" md="3">
-                          <v-btn hide-details icon @click="toggleActions(detail)">
-                            <v-icon>
-                              {{ detail.showActions ? 'mdi-eye-closed' : 'mdi-eye' }}
-                            </v-icon>
-                          </v-btn>
-                        </v-col>
-                        <v-col cols="3" md="3">
-                          <v-checkbox
-                            v-model="detail.estado"
-                            color="success"
-                            class="ml-2"
-                            dense
-                            hide-details
-                          ></v-checkbox>
-                        </v-col>
-                      </v-row>
-                    </v-col>
-                  </v-row>
-                </v-card>
-              </div>
-            </v-col>
-          </v-row>
+                  </template>
+                  <template v-slot:[`item.detalle`]="{ item }">
+                    {{ item.detalle }}
+                  </template>
+                  <template v-slot:[`item.monto`]="{ item }">
+                    S/.{{ item.monto }}
+                  </template>
+                  <template v-slot:[`item.estado`]="{ item }">
+                    <v-checkbox
+                      v-model="item.estado"
+                      color="success"
+                      dense
+                      hide-details
+                    ></v-checkbox>
+                  </template>
+                  <template v-slot:[`item.acciones`]="{ item }">
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-icon small color="secondaryColor" @click="editDetail(item)" v-bind="attrs" v-on="on">
+                          mdi-pencil
+                        </v-icon>
+                      </template>
+                      <span>Editar</span>
+                    </v-tooltip>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-icon small color="dangerColor" @click="removeDetail(item.id)" v-bind="attrs" v-on="on" >
+                          mdi-delete
+                        </v-icon>
+                      </template>
+                      <span>Eliminar</span>
+                    </v-tooltip>
+                  </template>
+                </v-data-table>
+              </v-col>
+            </v-row>
+          </v-container>
           <!-- Modal para detalles -->
           <v-dialog v-model="dialogDetail" max-width="400px">
             <v-card>
-              <v-card-title>
+              <v-card-title class="justify-center mb-2">
                 <span class="text-h6">{{ editIndex !== null ? 'Editar Detalle' : 'Agregar Detalle' }}</span>
               </v-card-title>
+              <v-divider class="mb-4"></v-divider>
               <v-card-text>
                 <v-form>
-                  <v-text-field
-                    label="Detalle"
-                    v-model="newDetail.detalle"
-                    outlined
-                  />
-                  <v-text-field
-                    label="Monto"
-                    v-model="newDetail.monto"
-                    outlined
-                    type="number"
-                  />
+                  <v-container>
+                    <v-row dense>
+                      <v-col cols="12" md="12">
+                        <v-text-field
+                          label="Detalle"
+                          v-model="newDetail.detalle"
+                          class="custom-autocomplete"
+                          outlined
+                          dense
+                          hide-details
+                        />
+                      </v-col>
+                      <v-col cols="12" md="12">
+                        <v-text-field
+                          label="Monto"
+                          v-model="newDetail.monto"
+                          outlined
+                          type="number"
+                          class="custom-autocomplete"
+                          dense
+                          hide-details
+                        />
+                      </v-col>
+                    </v-row>
+                  </v-container>
                 </v-form>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="editIndex !== null ? editDetail() : addDetail()">
+                <v-btn
+                  color="primaryColor"
+                  depressed
+                  @click="saveDetail(newDetail)"
+                  text
+                >
                   {{ editIndex !== null ? 'Editar' : 'Agregar' }}
                 </v-btn>
-                <v-btn color="grey" text @click="dialogDetail = false">
+                <v-btn color="neutralColor" text @click="closeDialogDetail">
                   Cancelar
                 </v-btn>
               </v-card-actions>
@@ -130,8 +176,10 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="saveCompra">Guardar</v-btn>
-        <v-btn color="grey" text @click="close">Cancelar</v-btn>
+          <v-btn color="primaryColor" text @click="saveCompra">
+            {{ this.compra.id === null ? 'Guardar' : 'Editar' }}
+          </v-btn>
+          <v-btn color="neutralColor" text @click="close">Cancelar</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -155,11 +203,19 @@ props: {
 },
 data() {
   return {
-    compra: { ...this.boxs },
     detailBox: [],
+    headers: [
+      { text: '#', value: 'index' },
+      { text: 'Detalle', value: 'detalle' },
+      { text: 'Monto', value: 'monto' },
+      { text: 'Estado', value: 'estado' },
+      { text: 'Acciones', value: 'acciones' }
+    ],
+    compra: { ...this.boxs },
     newDetail: { detalle: '', monto: 0, estado: false }, // Para capturar datos del modal
-    dialogDetail: false, // Control para abrir/cerrar el modal de detalle
-    editIndex: null
+    dialogDetail: false,
+    menuFecha: false,
+    editIndex: null,
   }
 },
 watch: {
@@ -199,22 +255,20 @@ methods: {
   removeDetail(index) {
     this.detailBox.splice(index, 1);
   },
-  editDetail (index) {
-    const detail =this.detailBox[index]
-    this.newDetail = { ...detail}
-    this.editIndex = index
-    this.dialogDetail = true
+  editDetail(detail) {
+    this.editIndex = this.detailBox.indexOf(detail);
+    this.newDetail = { ...detail };
+    this.dialogDetail = true;
   },
-  addDetail() {
-    if (this.newDetail.detalle && this.newDetail.monto) {
-      this.detailBox.push({
-        ...this.newDetail,
-        monto: parseFloat(this.newDetail.monto) // Convertir a número
-      });
-      this.newDetail = { id: null, detalle: '', monto: 0, estado: false }; // Reiniciar campos
-      this.dialogDetail = false; // Cerrar el modal
-    } else {
-      alert('Por favor, complete todos los campos.');
+  saveDetail(newDetail) {
+    console.log(newDetail)
+    if (this.newDetail !== null) {
+      if (this.editIndex !== null) {
+        this.detailBox.splice(this.editIndex, 1, newDetail);
+      } else {
+        this.detailBox.push(newDetail);
+      }
+      this.closeDialogDetail();
     }
   },
   async saveCompra() {
@@ -249,6 +303,15 @@ methods: {
       console.error('Error al guardar usuario:', error);
     }
   },
+  closeDialogDetail() {
+    this.dialogDetail = false
+    this.newDetail = {
+      detalle: '',
+      monto: 0,
+      estado: false
+    }
+    this.editIndex = null
+  },
   close () {
     this.$emit('closedialog')
     this.compra = {
@@ -264,7 +327,7 @@ methods: {
 }
 </script>
 <style scoped>
-.expanded {
-  margin-left: 10px; /* Desplaza ligeramente el texto cuando se expande */
+.custom-autocomplete ::v-deep(.v-input__control) {
+  border-radius: 10px;
 }
 </style>

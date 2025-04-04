@@ -159,14 +159,8 @@ export default {
         children: [
           { title: 'Dashboard', to: '/finanzas/dashboard'},
           { title: 'Ingresos', to: '/finanzas/ingresos' },
-          { title: 'Salidas', to: '/finanzas/salidas' }
-        ]
-      },
-      {
-        icon: 'mdi-basket',
-        title: 'Tareas y Compras',
-        children: [
-          { title: 'Compras', to: '/compras/compras' }
+          { title: 'Salidas', to: '/finanzas/salidas' },
+          { title: 'Compras', to: '/finanzas/compras' }
         ]
       },
       {

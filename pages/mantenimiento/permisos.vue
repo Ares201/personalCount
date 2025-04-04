@@ -58,8 +58,7 @@ export default {
         "/finanzas/dashboard",
         "/finanzas/ingresos",
         "/finanzas/salidas",
-        // Compras
-        "/compras/compras",
+        "/finanzas/compras",
         // Saturno
         "/saturno/dashboard",
         "/saturno/flashreport",
