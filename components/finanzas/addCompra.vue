@@ -37,12 +37,18 @@
                 </v-menu>
               </v-col>
               <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="compra.concepto"
-                  label="Concepto"
+                <v-autocomplete
+                  v-model="compra.categoria"
+                  color="secondaryColor"
+                  :items="['Disponible', 'Ahorro', 'Devolucion', 'Tecnologia', 'Salud', 'Pagos Mensuales', 'Familia', 'Otro']"
+                  item-text="name"
+                  label="Categoria"
                   class="custom-autocomplete"
+                  clearable
                   outlined
                   dense
+                  hide-no-data
+                  hide-selected
                   hide-details
                 />
               </v-col>
@@ -195,7 +201,7 @@ props: {
   boxs: { type: Object, default: () => ({
     id: null,
     fecha: '',
-    concepto: '',
+    categoria: '',
     monto: 0 ,
     descripcion: '',
     detailBox: []
@@ -283,7 +289,7 @@ methods: {
           fecha: this.compra.fecha,
           monto: this.detailBox.reduce((monto, detail) => monto + detail.monto, 0),
           descripcion: this.compra.descripcion,
-          concepto: this.compra.concepto,
+          categoria: this.compra.categoria,
           detailBox: this.detailBox
         });
       } else {
@@ -293,7 +299,7 @@ methods: {
           fecha: this.compra.fecha,
           monto: this.detailBox.reduce((monto, detail) => monto + detail.monto, 0),
           descripcion: this.compra.descripcion,
-          concepto: this.compra.concepto,
+          categoria: this.compra.categoria,
           detailBox: this.detailBox
         });
       }
@@ -319,7 +325,7 @@ methods: {
       fecha: '',
       monto: 0,
       descripcion: '',
-      concepto: '',
+      categoria: '',
       detailBox: []
     }
   },

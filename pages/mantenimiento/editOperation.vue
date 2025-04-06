@@ -27,7 +27,7 @@ export default {
     async update() {
       try {
         this.updatedDocs = []; // Limpiar la lista antes de actualizar
-        const updatedDocs = await this.$updateOperationField(); // 🔹 Espera la actualización
+        const updatedDocs = await this.$renameOperationField(); // 🔹 Espera la actualización
         this.updatedDocs = updatedDocs; // 🔹 Guarda los documentos actualizados en el estado
         alert("Actualización completada");
       } catch (error) {

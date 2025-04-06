@@ -188,7 +188,7 @@ export default {
       headers: [
         { text: '#', value: 'index', sortable: false },
         { text: 'Fecha', value: 'fecha', sortable: false },
-        { text: 'Concepto', value: 'concepto', sortable: false },
+        { text: 'Categoria', value: 'categoria', sortable: false },
         { text: 'Descripción', value: 'descripcion', sortable: false },
         { text: 'Monto', value: 'monto', sortable: false },
         { text: 'Estado', value: 'estado', sortable: false },
@@ -247,7 +247,7 @@ export default {
       this.selectedCompra = {
         id: null,
         fecha: new Date().toISOString().substr(0, 10),
-        concepto: '',
+        categoria: '',
         descripcion: '',
         monto: 0,
         estado: false,
@@ -302,7 +302,7 @@ export default {
     touchEnd(box) {
       if (this.touchEndX - this.touchStartX > this.swipeThreshold) {
         // Swipe derecho detectado
-        alert(`¡Tarjeta movida a la derecha!\n${box.descripcion}`);
+        // Swal.fire("Succes", `¡Tarjeta movida a la derecha!\n${box.descripcion}`);
         this.toggleActions(box); // Muestra/oculta acciones
       }
       this.resetTouch();
