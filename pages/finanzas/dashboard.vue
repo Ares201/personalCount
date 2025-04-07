@@ -1,109 +1,79 @@
 <template>
   <v-card elevation="2" class="pa-4" height="100%" tile>
     <v-card-title class="d-flex align-center mb-4">
-      <h2 class="text-h4">Movimiento de Ahorros</h2>
-      <v-spacer />
-      <v-select
-        v-model="selectedCategory"
-        :items="categories"
-        label="Categoría"
-        class="ml-2"
-        style="max-width: 200px"
-        color="secondaryColor"
-        hide-selected
-        hide-no-data
-        clearable
-        outlined
-        dense
-        hide-details
-      />
+      <v-row dense>
+        <v-col cols="12" md="8">
+          <span class="text-h6">
+            <v-icon color="primaryColor" class="mr-3">mdi-cash-multiple</v-icon>
+            RESUMEN FINANCIERO
+          </span>
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-select
+            v-model="selectedCategory"
+            :items="categories"
+            label="Categoría"
+            color="secondaryColor"
+            hide-selected
+            hide-no-data
+            clearable
+            outlined
+            dense
+            hide-details
+          />
+        </v-col>
+      </v-row>
     </v-card-title>
     <v-row>
-      <v-col cols="12" md="4">
+      <v-col cols="12" md="4" v-if="saldoTotal > 0">
         <v-card
           elevation="1"
           class="pa-4 balance-card"
-          :color="getStatusColor"
-          :class="{'positive-balance': saldoTotal > 0, 'negative-balance': saldoTotal < 0}"
+          :style="{ border: '2px solid #546E7A', borderRadius: '10px' }"
         >
           <div class="d-flex align-center">
             <v-icon size="36" class="mr-2">
               {{ saldoTotal > 0 ? 'mdi-trending-up' : 'mdi-trending-down' }}
             </v-icon>
             <div>
-              <div class="text-h6 mb-1">Saldo Total</div>
-              <div class="text-h4">S/. {{ formatNumber(saldoTotal) }}</div>
+              <div class="text-h12 mb-1">Saldo Total</div>
+              <div class="text-h8">S/. {{ formatNumber(saldoTotal) }}</div>
             </div>
           </div>
         </v-card>
       </v-col>
-      <v-col cols="12" md="4">
-        <v-card elevation="1" class="pa-4 income-card" color="secondaryColor">
+      <v-col cols="12" md="4" v-if="totalIngresos > 0">
+        <v-card elevation="1" class="pa-4 income-card" :style="{ border: '2px solid #2E7D32', borderRadius: '10px' }">
           <div class="d-flex align-center">
             <v-icon size="36" class="mr-2">mdi-cash-plus</v-icon>
             <div>
-              <div class="text-h6 mb-1">Total Ingresos</div>
-              <div class="text-h4">S/. {{ formatNumber(totalIngresos) }}</div>
+              <div class="text-h12 mb-1">Total Ingresos</div>
+              <div class="text-h8">S/. {{ formatNumber(totalIngresos) }}</div>
             </div>
           </div>
         </v-card>
       </v-col>
-      <v-col cols="12" md="4">
-        <v-card elevation="1" class="pa-4 expense-card" color="dangerColor">
+      <v-col cols="12" md="4" v-if="TotalSalidas > 0">
+        <v-card elevation="1" class="pa-4 expense-card" :style="{ border: '2px solid #E53945', borderRadius: '10px' }">
           <div class="d-flex align-center">
             <v-icon size="36" class="mr-2">mdi-cash-minus</v-icon>
             <div>
-              <div class="text-h6 mb-1">Total Salidas</div>
-              <div class="text-h4">S/. {{ formatNumber(TotalSalidas) }}</div>
+              <div class="text-h12 mb-1">Total Salidas</div>
+              <div class="text-h8">S/. {{ formatNumber(TotalSalidas) }}</div>
             </div>
           </div>
         </v-card>
       </v-col>
     </v-row>
-
     <v-row class="mt-4">
-      <v-col cols="12" md="8">
+      <v-col cols="12" md="12">
         <v-card elevation="1" class="pa-4">
-          <v-card-title class="d-flex justify-space-between align-center">
-            <span>Resumen Financiero</span>
-            <v-btn-toggle v-model="chartType" mandatory>
-              <v-btn value="bar">
-                <v-icon>mdi-chart-bar</v-icon>
-              </v-btn>
-              <v-btn value="line">
-                <v-icon>mdi-chart-line</v-icon>
-              </v-btn>
-            </v-btn-toggle>
-          </v-card-title>
           <div style="height: 400px">
             <BarChart ref="barChart" :chart-data="chartData" :options="chartOptions" />
           </div>
         </v-card>
       </v-col>
-      <v-col cols="12" md="4">
-        <v-card elevation="1">
-          <v-card-title class="text-center">
-            Movimientos por Tipo
-          </v-card-title>
-          <v-list>
-            <v-list-item v-for="(monto, tipo) in countByOperacion" :key="tipo">
-              <template v-slot:prepend>
-                <v-icon :color="getTipoColor(tipo)" class="mr-2">
-                  {{ tipo }}
-                </v-icon>
-              </template>
-              <v-list-item-title class="d-flex justify-space-between">
-                <span>{{ tipo }}</span>
-                <span :class="tipo === 'Ingreso' || tipo === 'Total' ? 'success--text' : 'error--text'">
-                  S/. {{ formatNumber(Math.abs(monto)) }}
-                </span>
-              </v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-card>
-      </v-col>
     </v-row>
-
     <v-card elevation="1" class="mt-4">
       <v-card-title class="d-flex justify-space-between align-center">
         <span>Historial de Transacciones</span>
@@ -112,7 +82,7 @@
           prepend-icon="mdi-magnify"
           label="Buscar"
           hide-details
-          style="max-width: 300px"
+          style="max-width: 200"
         />
       </v-card-title>
       <v-data-table
@@ -121,6 +91,8 @@
         :search="search"
         :items-per-page="5"
         class="elevation-0"
+        dense
+        mobile-breakpoint="0"
       >
         <template v-slot:[`item.tipo`]="{ item }">
             {{ item.tipo }}
@@ -152,8 +124,6 @@ export default {
       countByOperacion: {},
       selectedCategory: null,
       search: '',
-      chartType: 'bar',
-      timePeriods: ['Hoy', 'Esta semana', 'Este mes', 'Este año'],
       headers: [
         { title: 'Fecha', value: 'fecha', sortable: false },
         { title: 'Tipo', value: 'tipo', sortable: false, align: 'center' },
@@ -201,11 +171,11 @@ export default {
     }
   },
   computed: {
-    filterDocument(){
+    filterDocument() {
       return this.boxs.filter(doc => {
-        const estadoMatch = !this.selectedCategory || doc.categoria === this.selectedCategory
-        return estadoMatch
-      })
+        const categoriaMatch = !this.selectedCategory || doc.categoria === this.selectedCategory
+        return categoriaMatch;
+      });
     },
     filteredBoxs() {
       return this.filterDocument
@@ -213,28 +183,30 @@ export default {
     categories() {
       return [...new Set(this.boxs.map(t => t.categoria))]
     },
+    financialSummary() {
+      const ingresos = this.filteredBoxs.filter(item => item.tipo === 'Ingreso');
+      const salidas = this.filteredBoxs.filter(item => item.tipo === 'Salida');
+      const compras = this.filteredBoxs.filter(item => item.tipo === 'Compra');
+      return {
+        totalIngresos: ingresos.reduce((total, item) => total + item.monto, 0),
+        totalSalidas: salidas.reduce((total, item) => total + item.monto, 0),
+        totalCompras: compras.reduce((total, item) => total + item.monto, 0),
+        saldoTotal: ingresos.reduce((total, item) => total + item.monto, 0) -
+                  salidas.reduce((total, item) => total + item.monto, 0)
+      };
+    },
+    // Accesores más simples
     totalIngresos() {
-      return  this.filteredBoxs
-        .filter(item => item.tipo === 'Ingreso')
-        .reduce((total, item) => total + item.monto, 0)
+      return this.financialSummary.totalIngresos;
     },
     TotalSalidas() {
-      return  this.filteredBoxs
-        .filter(item => item.tipo === 'Salida')
-        .reduce((total, item) => total + item.monto, 0)
+      return this.financialSummary.totalSalidas;
     },
     TotalCompras() {
-      return  this.filteredBoxs
-        .filter(item => item.tipo === 'Compra')
-        .reduce((total, item) => total + item.monto, 0)
+      return this.financialSummary.totalCompras;
     },
     saldoTotal() {
-      return this.totalIngresos - this.TotalSalidas || this.TotalCompras
-    },
-    getStatusColor() {
-      if (this.saldoTotal > 0) return 'info'
-      if (this.saldoTotal < 0) return 'primaryColor'
-      return 'grey'
+      return this.financialSummary.saldoTotal;
     }
   },
   beforeMount() {
@@ -269,14 +241,6 @@ export default {
       } catch (error) {
         console.log('Error al obtener los datos:', error)
       }
-    },
-    getTipoColor(tipo) {
-      const colors = {
-        'Ingreso': 'success',
-        'Salida': 'error',
-        'Total': 'info'
-      }
-      return colors[tipo] || 'grey'
     },
     formatNumber(number) {
       return new Intl.NumberFormat('es-PE').format(number)
@@ -319,15 +283,6 @@ export default {
   background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
   pointer-events: none;
 }
-
-.positive-balance {
-  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
-}
-
-.negative-balance {
-  background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
-}
-
 .v-data-table {
   border-radius: 8px;
 }

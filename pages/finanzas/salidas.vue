@@ -65,11 +65,6 @@
           >{{ item.categoria || 'Sin Categoria' }}</v-chip>
         </template>
         <template v-slot:[`item.acciones`]="{ item }">
-          <v-chip
-            v-if="item.categoria === 'Prestamo'"
-            :color="returnEstado(item).color"
-            @click="changeType(item)"> {{ item.categoria }}
-          </v-chip>
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
               <v-icon small color="secondaryColor" @click="editSalida(item)" v-bind="attrs" v-on="on">
@@ -164,37 +159,6 @@ export default {
       }
       this.dialogComponent = true
     },
-    async changeType(item) {
-      const confirm = await Swal.fire({
-        title: "¿Estás seguro que deseas ingresar Ahorros?",
-        text: "Excelente estas Pagando una deuda de tus ahorros.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Sí, ingresar",
-        cancelButtonText: "Cancelar"
-      });
-      if (confirm.isConfirmed) {
-        try {
-          const newItem = {
-            ...item,
-            id: null,
-            tipo: 'Ingreso',
-            categoria: 'Devolucion',
-          };
-          await createBox(newItem);
-          await updateBox(item.id, {
-            categoria: 'Cancelado',
-          });
-          await this.fetchSalidas()
-          Swal.fire("Movido", "Se ha creado un nuevo registro de Ingreso.", "success");
-        } catch (error) {
-          console.error("Error al crear nuevo registro:", error);
-          Swal.fire("Error", "No se pudo crear el nuevo registro de Ingreso.", "error");
-        }
-      }
-    },
     getFechaHoy() {
       const hoy = new Date();
       return hoy.toISOString().split("T")[0]; // Formato YYYY-MM-DD
@@ -203,15 +167,12 @@ export default {
       let color = "default";
       let text = "default";
 
-      if (item.categoria === "Compras") {
-        color = "#D4F8E8"; // Verde
-        text = "#26734D";
-      } else if (item.categoria === "Prestamo") {
+      if (item.categoria === "Ahorro") {
         color = "#FFD6D9"; // Rojo
         text = "#A8323E";
-      } else if (item.categoria === "Otro") {
-        color = "#FFF4C2"; // Amarillo
-        text = "#B8860B";
+      } else if (item.categoria === "Disponible") {
+        color = "#D4F8E8"; // Verde
+        text = "#26734D";
       }
       return { color, text };
     },

@@ -26,7 +26,7 @@
         <v-col cols="12" md="4">
           <v-autocomplete
             v-model="selectedEstado"
-            :items="['Ahorro', 'Disponible', 'Devolucion']"
+            :items="['Ahorro', 'Disponible']"
             append-icon="mdi-information-outline"
             label="Estado"
             color="secondaryColor"
@@ -95,7 +95,7 @@
 </template>
 <script>
 import Swal from "sweetalert2";
-import { getBoxs, deleteBox, updateBox } from '../../services/boxServices';
+import { getBoxs, deleteBox } from '../../services/boxServices';
 import addIngreso from '../../components/finanzas/addIngreso.vue';
 export default {
   name: 'Ingresos',

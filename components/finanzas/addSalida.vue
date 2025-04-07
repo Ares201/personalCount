@@ -51,7 +51,7 @@
               <v-autocomplete
                 v-model="salida.categoria"
                 color="secondaryColor"
-                :items="['Compras', 'Prestamo', 'Otro']"
+                :items="['Ahorro', 'Disponible']"
                 item-text="name"
                 label="Categoria"
                 class="custom-autocomplete"

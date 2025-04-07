@@ -51,7 +51,7 @@
               <v-autocomplete
                 v-model="ingreso.categoria"
                 color="secondaryColor"
-                :items="['Disponible', 'Ahorro', 'Devolucion', 'Otro']"
+                :items="['Disponible', 'Ahorro']"
                 item-text="name"
                 label="Categoria"
                 class="custom-autocomplete"
