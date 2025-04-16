@@ -241,7 +241,9 @@
               </v-col>
               <v-col v-if="document.fechaRepuesta" cols="12" md="6">
                 <v-select
-                  :items="['Giancarlo Cervera', 'Paolo Limaco', 'Jair Macazana', 'Ronal Zevallos', 'Victor Pinto']"
+                  :items="employees"
+                  item-text="name"
+                  item-value="id"
                   label="Operador CC"
                   class="custom-autocomplete"
                   v-model="document.operador"
