@@ -42,7 +42,7 @@
     </v-card-text>
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn color="primaryColor" text @click="saveOperationMine" :loading="loading">
+      <v-btn color="primaryColor" text @click="saveOperationMine">
           {{ this.OperationMine.id === null ? 'Guardar' : 'Editar' }}
         </v-btn>
       <v-btn color="neutralColor" text @click="close">Cancelar</v-btn>

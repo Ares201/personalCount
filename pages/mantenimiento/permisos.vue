@@ -53,6 +53,7 @@ export default {
         // Mantenimiento
         "/mantenimiento/usuarios",
         "/mantenimiento/empleados",
+        "/mantenimiento/vehiculo",
         "/saturno/operacionesMina",
         // Finanzas
         "/finanzas/dashboard",

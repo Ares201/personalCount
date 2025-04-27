@@ -29,23 +29,59 @@
                     hide-details
                   />
                 </v-col>
-                <v-col cols="6" md="3">
+                <v-col cols="12" md="3">
                   <v-label>Placa Tracto:</v-label>
-                  <v-text-field
+                  <v-autocomplete
+                    :items="tractoVehicles"
                     v-model="event.placaTracto"
+                    item-text="plate"
+                    item-value="id"
+                    color="secondaryColor"
+                    class="custom-autocomplete"
                     outlined
                     dense
+                    clearable
+                    return-object
                     hide-details
-                  />
+                    @change="updateCamera"
+                  >
+                    <template #append-item>
+                      <v-divider />
+                      <v-list-item link @click="OpenDialogVehicle()" class="fixed-option">
+                          <a>
+                            + Placa Tracto
+                          </a>
+                        </v-list-item>
+                      <v-divider />
+                    </template>
+                  </v-autocomplete>
                 </v-col>
-                <v-col cols="6" md="3">
-                  <v-label>Placa Careta:</v-label>
-                  <v-text-field
+                <v-col cols="12" md="3">
+                  <v-label>Placa Carreta:</v-label>
+                  <v-autocomplete
+                    :items="carretaVehicles"
                     v-model="event.placaCarreta"
+                    item-text="plate"
+                    item-value="id"
+                    color="secondaryColor"
+                    class="custom-autocomplete"
                     outlined
                     dense
+                    clearable
+                    return-object
                     hide-details
-                  />
+                    @change="updateCamera"
+                  >
+                    <template #append-item>
+                      <v-divider />
+                      <v-list-item link @click="OpenDialogVehicle()" class="fixed-option">
+                          <a>
+                            + Placa Carreta
+                          </a>
+                        </v-list-item>
+                      <v-divider />
+                    </template>
+                  </v-autocomplete>
                 </v-col>
                 <v-col cols="12" md="3">
                   <v-label>Fecha:</v-label>
@@ -120,13 +156,12 @@
                 </v-col>
                 <v-col cols="3">
                   <v-label>Cámaras:</v-label>
-                  <v-select
-                    :items="['Si Cuenta', 'No Cuenta']"
+                  <v-text-field
                     v-model="event.camaras"
                     outlined
                     dense
                     hide-details
-                    clearable
+                    readonly
                   />
                 </v-col>
                 <v-col cols="6">
@@ -159,7 +194,7 @@
       </v-card>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primaryColor" text @click="saveEvent" :loading="loading">
+        <v-btn color="primaryColor" text @click="saveEvent">
           {{ this.event.id === null ? 'Guardar' : 'Editar' }}
         </v-btn>
         <v-btn color="neutralColor" text @click="close">Cancelar</v-btn>
@@ -170,6 +205,12 @@
           @closedialog="closedialogEmployee"
           @saveEmployee="saveEmployees"
         />
+      <!-- Componente addVehicle -->
+      <add-vehicle
+        :dialog = "dialogVehicle"
+        @closedialog="closedialogVehicle"
+        @saveVehicle="saveVehicle"
+      />
     </v-card>
   </v-dialog>
 </template>
@@ -177,13 +218,16 @@
 import Swal from 'sweetalert2'
 import { createEvent, updateEvent } from '../../services/eventServices';
 import { getEmployees } from '../../services/employeeServices';
+import { getVehicles } from '../../services/vehicleServices';
 import { getOperationMines } from '../../services/operationMineServices';
 import addEmployee from '../../components/configuracion/addEmployee';
+import addVehicle from '../../components/configuracion/addVehicle.vue';
 
 export default {
   name: 'addEvent',
   components: {
-    addEmployee
+    addEmployee,
+    addVehicle
   },
   props: {
     dialog: { type: Boolean, default: false },
@@ -210,9 +254,10 @@ export default {
   data() {
     return {
       dialogEmployee: false,
+      dialogVehicle: false,
       menuFecha: false,
-      loading: false,
       employees : [],
+      vehicles: [],
       operations : [],
       event: { ...this.events },
     }
@@ -251,16 +296,22 @@ export default {
   computed: {
     formTitle() {
       return this.event.id === null ? 'Nuevo Evento' : 'Editar Evento'
-    }
+    },
+    tractoVehicles() {
+      return this.vehicles.filter(vehicle => vehicle.vehicleType === 'TRACTO')
+    },
+    carretaVehicles() {
+      return this.vehicles.filter(vehicle => vehicle.vehicleType === 'CARRETA')
+    },
   },
   beforeMount() {
     this.getEmployees()
+    this.getVehicles()
     this.getOperationMines()
   },
   methods: {
     async saveEvent() {
       try {
-        this.loading = true
         if (this.event.id) {
           await updateEvent(this.event.id, {
             evento: this.event.evento,
@@ -294,7 +345,6 @@ export default {
         }
         this.$emit('saveEvent')
         this.close()
-        this.loading= false
       } catch (error) {
         console.error('Error al guardar evento:', error)
       }
@@ -302,6 +352,9 @@ export default {
     OpenDialogEmployee(){
       console.log(this.dialogEmployee)
       this.dialogEmployee = true
+    },
+    OpenDialogVehicle(){
+      this.dialogVehicle = true
     },
     async getEmployees() {
       try {
@@ -318,6 +371,13 @@ export default {
         console.error('Error al obtener operaciones:', error)
       }
     },
+    async getVehicles() {
+      try {
+        this.vehicles = await getVehicles()
+      } catch (error) {
+        console.error('Error al obtener vehiculos:', error)
+      }
+    },
     saveEmployees() {
       Swal.fire({
         icon: 'success',
@@ -326,9 +386,29 @@ export default {
         timer: 1500
       })
     },
+    async saveVehicle() {
+      Swal.fire({
+        icon: 'success',
+        title: 'Vehiculo guardado con éxito',
+        showConfirmButton: false,
+        timer: 1500
+      })
+    },
+    updateCamera(vehicle) {
+      if (vehicle && vehicle.hasCamera) {
+        this.event.camaras = 'Si Cuenta'
+      } else {
+        this.event.camaras = 'No Cuenta'
+      }
+    },
     closedialogEmployee() {
       this.dialogEmployee = false;
       this.getEmployees()
+      this.getOperationMines()
+    },
+    closedialogVehicle() {
+      this.dialogVehicle = false;
+      this.getVehicles()
       this.getOperationMines()
     },
     close() {

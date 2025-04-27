@@ -52,7 +52,7 @@
               outlined
               dense
               hide-details
-            ></v-autocomplete>
+            />
           </v-col>
       </v-row>
       <v-data-table

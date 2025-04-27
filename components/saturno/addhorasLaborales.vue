@@ -119,7 +119,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primaryColor" text @click="saveHwork" :loading="loading">
+        <v-btn color="primaryColor" text @click="saveHwork">
           {{ this.hwork.id === null ? 'Guardar' : 'Editar' }}
         </v-btn>
         <v-btn color="neutralColor" text @click="close">Cancelar</v-btn>
@@ -172,7 +172,6 @@ export default {
       },
       dialogEmployee: false,
       menuFecha: false,
-      loading: false,
       currentTime: '',
     }
   },
@@ -232,7 +231,6 @@ export default {
     },
     async saveHwork() {
       try {
-        this.loading = true;
         if (!this.hwork.startTime) {
           this.hwork.startTime = this.currentTime;
         }
@@ -269,7 +267,6 @@ export default {
         }
         this.$emit("saveHwork");
         this.close();
-        this.loading = false;
       } catch (error) {
         console.error("Error al guardar hwork:", error);
       }

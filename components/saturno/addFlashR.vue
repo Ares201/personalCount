@@ -82,15 +82,31 @@
                   <v-date-picker color="secondaryColor" v-model="document.fechaEnvio" @input="menuFecha = false"></v-date-picker>
                 </v-menu>
               </v-col>
-              <v-col cols="6" md="3">
-                <v-text-field
-                  label="Placa Tracto"
-                  class="custom-autocomplete"
+              <v-col cols="12" md="3">
+                <v-autocomplete
+                  :items="vehicles"
                   v-model="document.placaTracto"
+                  item-text="plate"
+                  item-value="id"
+                  label="Placa Tracto"
+                  color="secondaryColor"
+                  class="custom-autocomplete"
                   outlined
                   dense
+                  clearable
+                  return-object
                   hide-details
-                />
+                >
+                  <template #append-item>
+                    <v-divider />
+                    <v-list-item link @click="OpenDialogVehicle()" class="fixed-option">
+                        <a>
+                          + Placa Tracto
+                        </a>
+                      </v-list-item>
+                    <v-divider />
+                  </template>
+                </v-autocomplete>
               </v-col>
               <v-col cols="6" md="3">
                 <v-text-field
@@ -277,6 +293,12 @@
           @closedialog="closedialogEmployee"
           @saveEmployee="saveEmployees"
         />
+      <!-- Componente addVehicle -->
+      <add-vehicle
+        :dialog = "dialogVehicle"
+        @closedialog="closedialogVehicle"
+        @saveVehicle="saveVehicle"
+      />
     </v-card>
   </v-dialog>
 </template>
@@ -284,13 +306,16 @@
 import Swal from 'sweetalert2'
 import { createDocument, updateDocument } from '../../services/documentServices';
 import { getEmployees } from '../../services/employeeServices';
+import { getVehicles } from '../../services/vehicleServices';
 import addEmployee from '../../components/configuracion/addEmployee';
+import addVehicle from '../../components/configuracion/addVehicle.vue';
 import { getOperationMines } from '../../services/operationMineServices';
 
 export default {
   name: 'addDocument',
   components: {
-    addEmployee
+    addEmployee,
+    addVehicle
   },
   props: {
     dialog: { type: Boolean, default: false },
@@ -319,11 +344,12 @@ export default {
   },
   data() {
     return {
-      loading: false,
       document: { ...this.documents },
       employees : [],
+      vehicles: [],
       operations : [],
       dialogEmployee: false,
+      dialogVehicle: false,
       menuFecha: false,
       menuFecha2: false,
       menuFecha3: false,
@@ -377,6 +403,7 @@ export default {
   },
   beforeMount() {
     this.getEmployees()
+    this.getVehicles()
     this.getOperationMines()
   },
   methods: {
@@ -417,13 +444,13 @@ export default {
       } catch (error) {
         console.error('Error al guardar documento:', error);
         Swal.fire('Error', 'No se pudo guardar el documento', 'error');
-      } finally {
-        this.loading = false;
       }
     },
     OpenDialogEmployee(){
-      console.log(this.dialogEmployee)
       this.dialogEmployee = true
+    },
+    OpenDialogVehicle(){
+      this.dialogVehicle = true
     },
     async getOperationMines() {
       try {
@@ -440,6 +467,13 @@ export default {
         console.error('Error al obtener empleados:', error)
       }
     },
+    async getVehicles() {
+      try {
+        this.vehicles = await getVehicles()
+      } catch (error) {
+        console.error('Error al obtener vehiculos:', error)
+      }
+    },
     saveEmployees() {
       Swal.fire({
         icon: 'success',
@@ -448,9 +482,22 @@ export default {
         timer: 1500
       })
     },
+    async saveVehicle() {
+      Swal.fire({
+        icon: 'success',
+        title: 'Vehiculo guardado con éxito',
+        showConfirmButton: false,
+        timer: 1500
+      })
+    },
     closedialogEmployee() {
       this.dialogEmployee = false;
       this.getEmployees()
+      this.getOperationMines()
+    },
+    closedialogVehicle() {
+      this.dialogVehicle = false;
+      this.getVehicles()
       this.getOperationMines()
     },
     close() {

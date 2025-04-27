@@ -149,6 +149,7 @@ export default {
           { title: 'Usuarios', to: '/mantenimiento/usuarios' },
           { title: 'Permisos', to: '/mantenimiento/permisos' },
           { title: 'Empleados', to: '/mantenimiento/empleados' },
+          { title: 'Vehiculos', to: '/mantenimiento/vehiculo' },
           // { title: 'Editar Operaciones', to: '/mantenimiento/editOperation'},
           { title: 'Operaciones Mina', to: '/saturno/operacionesMina' },
         ]
@@ -168,6 +169,7 @@ export default {
         title: 'Saturno',
         children: [
           { title: 'Dashboard', to:'/saturno/dashboard' },
+          { title: 'Transporte', to:'/saturno/transporteMinerales' },
           { title:'Horas Laborales', to:'/saturno/horasLaborales' },
           { title:'Eventos', to:'/saturno/eventos' },
           { title: 'FlashReport', to:'/saturno/flashreport' },

@@ -143,7 +143,7 @@
                     <div><strong>Ubicación:</strong> {{ event.ubicacion }}</div>
                     <div><strong>Detalles:</strong> {{ event.detalle }}</div>
                     <v-btn color="primary" @click="copyToClipboard(event)">📋 Copiar</v-btn>
-                    <v-btn color="success" @click="copyToClipboard(event)"> Realizar Flash Rª</v-btn>
+                    <v-btn color="success" @click="convertDocument(event)"> Realizar Flash Rª</v-btn>
                   </v-card-text>
                 </v-col>
               </v-row>
@@ -165,6 +165,7 @@
 import Swal from "sweetalert2";
 import addEvent from '../../components/saturno/addEvento.vue';
 import { getEvents, deleteEvent } from '../../services/eventServices';
+import { createDocument } from '../../services/documentServices';
 import { getOperationMines } from '../../services/operationMineServices';
 
 export default {
@@ -217,6 +218,21 @@ export default {
     await this.getOperationMines()
   },
   methods: {
+    async convertDocument(event) {
+      try {
+        // 1. Clonamos el objeto sin el ID si está dentro del contenido
+        const { id, ...eventData } = event
+        // 2. Creamos nuevo documento en la colección 'documents'
+        const newDocId = await createDocument({
+          ...eventData,
+          fechaEnvio: event.fecha,
+          estado: 'Pendiente' // ejemplo
+        })
+        console.log('Documento creado con ID:', newDocId)
+      } catch (error) {
+        console.error('Error al convertir documento:', error)
+      }
+    },
     copyToClipboard(event) {
       const formattedText = `
       📢 *CENTRO CONTROL INFORMA*
