@@ -54,7 +54,7 @@
             <v-col cols="12" md="6">
               <v-switch
                 v-model="currentVehicle.hasCamera"
-                label="No Cuenta con Camara"
+                :label="currentVehicle.hasCamera ? 'Equipado' : 'No Equipado'"
                 color="primary"
                 class="custom-autocomplete"
                 hide-details
@@ -94,7 +94,7 @@ props: {
       plate: '',
       operations: '',
       brand: '',
-      hasCamera: '',
+      hasCamera: false,
     })
   }  // Vehiculo a editar
 },
@@ -138,7 +138,11 @@ methods: {
       this.$emit('saveVehicle')
       this.close()
     } catch (error) {
-      Swal.fire('Error al guardar usuario:', error)
+      Swal.fire({
+        title: 'Error al guardar vehículo',
+        html: `<pre>${error.message || error}</pre>`,
+        icon: 'error'
+      })
     }
   },
   async getOperationMines() {
@@ -155,7 +159,7 @@ methods: {
       vehicleType: '',
       plate: '',
       brand: '',
-      hasCamera: '',
+      hasCamera: false,
     }
   },
 }

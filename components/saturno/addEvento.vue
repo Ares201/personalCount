@@ -13,12 +13,30 @@
               <v-row dense>
                 <v-col cols="6">
                   <v-label>Evento:</v-label>
-                  <v-text-field
+                  <v-autocomplete
+                    :items="plantillas"
                     v-model="event.evento"
+                    item-text="title"
+                    item-value="id"
+                    color="secondaryColor"
+                    class="custom-autocomplete"
                     outlined
                     dense
+                    clearable
+                    return-object
                     hide-details
-                  />
+                    @change="updateLevel"
+                  >
+                    <template #append-item>
+                      <v-divider />
+                      <v-list-item link @click="OpenDialogPlantilla()" class="fixed-option">
+                          <a>
+                            + Plantilla
+                          </a>
+                        </v-list-item>
+                      <v-divider />
+                    </template>
+                  </v-autocomplete>
                 </v-col>
                 <v-col cols="6">
                   <v-label>Nivel:</v-label>
@@ -166,18 +184,13 @@
                 </v-col>
                 <v-col cols="6">
                   <v-label>Operaciòn:</v-label>
-                  <v-autocomplete
+                  <v-text-field
                     v-model="event.contrato"
-                    color="secondaryColor"
-                    :items="operations"
-                    item-text="name"
-                    clearable
                     outlined
                     dense
-                    hide-no-data
-                    hide-selected
                     hide-details
-                  ></v-autocomplete>
+                    readonly
+                  />
                 </v-col>
                 <v-col cols="6">
                   <v-label>Ubicación:</v-label>
@@ -211,23 +224,31 @@
         @closedialog="closedialogVehicle"
         @saveVehicle="saveVehicle"
       />
+      <!-- Componente addPlantilla -->
+      <add-plantilla
+        :dialog = "dialogPlantilla"
+        @closedialog="closedialogPlantilla"
+        @savePlantilla="savePlantilla"
+      />
     </v-card>
   </v-dialog>
 </template>
 <script>
 import Swal from 'sweetalert2'
 import { createEvent, updateEvent } from '../../services/eventServices';
+import { getPlantillas } from '../../services/plantillaServices';
 import { getEmployees } from '../../services/employeeServices';
 import { getVehicles } from '../../services/vehicleServices';
-import { getOperationMines } from '../../services/operationMineServices';
 import addEmployee from '../../components/configuracion/addEmployee';
 import addVehicle from '../../components/configuracion/addVehicle.vue';
+import addPlantilla from '../../components/configuracion/addPlantilla.vue';
 
 export default {
   name: 'addEvent',
   components: {
     addEmployee,
-    addVehicle
+    addVehicle,
+    addPlantilla
   },
   props: {
     dialog: { type: Boolean, default: false },
@@ -255,10 +276,11 @@ export default {
     return {
       dialogEmployee: false,
       dialogVehicle: false,
+      dialogPlantilla: false,
       menuFecha: false,
+      plantillas: [],
       employees : [],
       vehicles: [],
-      operations : [],
       event: { ...this.events },
     }
   },
@@ -305,9 +327,9 @@ export default {
     },
   },
   beforeMount() {
+    this.getPlantillas()
     this.getEmployees()
     this.getVehicles()
-    this.getOperationMines()
   },
   methods: {
     async saveEvent() {
@@ -356,19 +378,22 @@ export default {
     OpenDialogVehicle(){
       this.dialogVehicle = true
     },
+    OpenDialogPlantilla(){
+      this.dialogPlantilla = true
+    },
+    async getPlantillas() {
+      try {
+        this.plantillas = await getPlantillas()
+      } catch (error) {
+        console.error('Error al obtener plantillas:', error)
+      }
+    },
     async getEmployees() {
       try {
         this.employees = await getEmployees()
         console.log(this.employees)
       } catch (error) {
         console.error('Error al obtener empleados:', error)
-      }
-    },
-    async getOperationMines() {
-      try {
-        this.operations = await getOperationMines()
-      } catch (error) {
-        console.error('Error al obtener operaciones:', error)
       }
     },
     async getVehicles() {
@@ -394,22 +419,41 @@ export default {
         timer: 1500
       })
     },
+    async savePlantilla() {
+      Swal.fire({
+        icon: 'success',
+        title: 'Plantilla guardada con éxito',
+        showConfirmButton: false,
+        timer: 1500
+      })
+    },
     updateCamera(vehicle) {
-      if (vehicle && vehicle.hasCamera) {
-        this.event.camaras = 'Si Cuenta'
+      console.log(vehicle)
+      if (vehicle) {
+        this.event.camaras = vehicle.camera ? 'Si Cuenta' : 'No Cuenta';
+        this.event.contrato = vehicle.operations || null;
+      }
+    },
+    updateLevel(plantilla) {
+      console.log(plantilla)
+      if (plantilla) {
+        this.event.nivel = plantilla.level
+        this.event.detalle = plantilla.description
       } else {
-        this.event.camaras = 'No Cuenta'
+        this.event.nivel = ''
       }
     },
     closedialogEmployee() {
       this.dialogEmployee = false;
       this.getEmployees()
-      this.getOperationMines()
     },
     closedialogVehicle() {
       this.dialogVehicle = false;
       this.getVehicles()
-      this.getOperationMines()
+    },
+    closedialogPlantilla() {
+      this.dialogPlantilla = false;
+      this.getPlantillas()
     },
     close() {
       this.$emit('closedialog')

@@ -150,6 +150,7 @@ export default {
           { title: 'Permisos', to: '/mantenimiento/permisos' },
           { title: 'Empleados', to: '/mantenimiento/empleados' },
           { title: 'Vehiculos', to: '/mantenimiento/vehiculo' },
+          { title: 'Plantillas', to: '/mantenimiento/plantillasGenerales' },
           // { title: 'Editar Operaciones', to: '/mantenimiento/editOperation'},
           { title: 'Operaciones Mina', to: '/saturno/operacionesMina' },
         ]
