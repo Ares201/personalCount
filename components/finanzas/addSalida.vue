@@ -51,8 +51,8 @@
               <v-autocomplete
                 v-model="salida.categoria"
                 color="secondaryColor"
-                :items="['Ahorro', 'Disponible']"
-                item-text="name"
+                :items="plantillas"
+                item-text="title"
                 label="Categoria"
                 class="custom-autocomplete"
                 clearable
@@ -89,6 +89,7 @@
 <script>
 import Swal from "sweetalert2";
 import { createBox, updateBox } from '../../services/boxServices';
+import { getPlantillas } from "../../services/plantillaServices";
 export default {
 name: 'addSalida',
 props: {
@@ -97,6 +98,7 @@ props: {
 },
 data() {
   return {
+    plantillas: [],
     salida: { ...this.boxs },
     menuFecha: false
   }
@@ -113,6 +115,9 @@ computed: {
   formTitle() {
     return this.salida.id === null ? 'Nueva Salida' : 'Editar Salida'
   }
+},
+beforeMount() {
+  this.getPlantillas()
 },
 methods: {
   async saveSalida() {
@@ -148,6 +153,15 @@ methods: {
       this.close()
     } catch (error) {
       console.error('Error al guardar usuario:', error)
+    }
+  },
+  async getPlantillas() {
+    try {
+      const plantillas = await getPlantillas()
+      this.plantillas = plantillas.filter(item => item.category === 'FINANZAS')
+      console.log('Plantillas', this.plantillas)
+    } catch (error) {
+      console.error('Error al obtener plantillas:', error)
     }
   },
   close () {

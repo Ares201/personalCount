@@ -177,7 +177,7 @@
 <script>
 import Swal from 'sweetalert2';
 import { getBoxs, deleteBox } from '../../services/boxServices';
-import addCompra from '../../components/finanzas/addCompra.vue';
+import addCompra from '../../components/gestion/addTarea.vue';
 export default {
   name: 'Compras',
   components :{

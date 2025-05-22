@@ -11,7 +11,8 @@
         <v-col cols="12" md="4">
           <v-select
             v-model="selectedCategory"
-            :items="categories"
+            :items="plantillas"
+            item-text="title"
             label="Categoría"
             color="secondaryColor"
             hide-selected
@@ -113,6 +114,7 @@
 <script>
 import BarChart from '../../components/chart/Barchart'
 import { getBoxs } from '../../services/boxServices'
+import { getPlantillas } from "../../services/plantillaServices";
 
 export default {
   components: {
@@ -121,6 +123,7 @@ export default {
   data() {
     return {
       boxs: [],
+      plantillas: [],
       countByOperacion: {},
       selectedCategory: null,
       search: '',
@@ -211,6 +214,8 @@ export default {
   },
   beforeMount() {
     this.fetchBoxs()
+    this.getPlantillas()
+    console.log('Boxs', getBoxs())
   },
   methods: {
     async fetchBoxs() {
@@ -240,6 +245,15 @@ export default {
         })
       } catch (error) {
         console.log('Error al obtener los datos:', error)
+      }
+    },
+    async getPlantillas() {
+      try {
+        const plantillas = await getPlantillas()
+        this.plantillas = plantillas.filter(item => item.category === 'FINANZAS')
+        console.log('Plantillas', this.plantillas)
+      } catch (error) {
+        console.error('Error al obtener plantillas:', error)
       }
     },
     formatNumber(number) {

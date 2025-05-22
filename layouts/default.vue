@@ -162,7 +162,14 @@ export default {
           { title: 'Dashboard', to: '/finanzas/dashboard'},
           { title: 'Ingresos', to: '/finanzas/ingresos' },
           { title: 'Salidas', to: '/finanzas/salidas' },
-          { title: 'Compras', to: '/finanzas/compras' }
+        ]
+      },
+      {
+        icon: 'mdi-text-box-check-outline',
+        title: 'Gestion',
+        children: [
+          // { title: 'Dashboard', to: '/gestion/dashboard'},
+          { title: 'Tareas', to: '/gestion/tareas' },
         ]
       },
       {

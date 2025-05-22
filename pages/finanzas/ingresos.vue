@@ -170,15 +170,36 @@ export default {
       let color = "default";
       let text = "default";
 
-      if (item.categoria === "Disponible") {
-        color = "#D4F8E8"; // Verde
+      if (item.categoria === "AHORRO") {
+        color = "#D4F8E8";
         text = "#26734D";
-      } else if (item.categoria === "Ahorro") {
-        color = "#FFD6D9"; // Rojo
-        text = "#A8323E";
-      } else if (item.categoria === "Otro") {
-        color = "#FFF4C2"; // Amarillo
-        text = "#B8860B";
+      } else if (item.categoria === "INTERBANK") {
+        color = "green";
+        text = "white";
+      } else if (item.categoria === "BCP") {
+        color = "#FF7217";
+        text = "#001D66";
+      } else if (item.categoria === "SCOTIABANK") {
+        color = "#FADBD8";
+        text = "#C8102E";
+      } else if (item.categoria === "BBVA") {
+        color = "#E3F2FD";
+        text = "#0033A0";
+      } else if (item.categoria === "CAJA PIURA") {
+        color = "#E6F0FA";
+        text = "#0072CE";
+      } else if (item.categoria === "CAJA AREQUIPA") {
+        color = "#E6F0FA";
+        text = "#005BAC";
+      } else if (item.categoria === "BANBIF") {
+        color = "#E0F7FA";
+        text = "#0077C8";
+      } else if (item.categoria === "OTRO") {
+        color = "#F5F5F5";
+        text = "#666";
+      } else {
+        color = "#FFFFFF";
+        text = "#000000";
       }
       return { color, text };
     },
