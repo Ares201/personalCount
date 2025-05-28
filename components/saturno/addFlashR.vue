@@ -346,7 +346,7 @@ export default {
             numero: '',
             operacion: '',
             evento: '',
-            placaTracto: '' || placaTracto.title,
+            placaTracto: '',
             placaCarreta:'',
             ubicacion: '',
             fechaEnvio: '',
