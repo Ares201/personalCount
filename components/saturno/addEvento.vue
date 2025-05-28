@@ -6,7 +6,6 @@
       </v-card-title>
       <v-divider class="mb-4"></v-divider>
       <v-card>
-        <!-- <v-card-title class="headline">CENTRO CONTROL INFORMA</v-card-title> -->
         <v-card-text>
           <v-form ref="form">
             <v-container>
@@ -383,7 +382,11 @@ export default {
     },
     async getPlantillas() {
       try {
-        this.plantillas = await getPlantillas()
+        const plantillas = await getPlantillas()
+        this.plantillas = plantillas.filter(item =>
+          item.category === 'MECANICA' ||
+          item.category === 'NEUMATICOS'
+        )
       } catch (error) {
         console.error('Error al obtener plantillas:', error)
       }

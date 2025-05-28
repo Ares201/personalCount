@@ -9,6 +9,22 @@
         <v-form ref="form">
           <v-container>
             <v-row dense>
+              <v-col cols="12" sm="12">
+                <v-autocomplete
+                  v-model="compra.titulo"
+                  color="secondaryColor"
+                  :items="plantillas"
+                  item-text="title"
+                  label="Titulo"
+                  class="custom-autocomplete"
+                  clearable
+                  outlined
+                  dense
+                  hide-no-data
+                  hide-selected
+                  hide-details
+                />
+              </v-col>
               <v-col cols="12" sm="6">
                 <v-menu
                   v-model="menuFecha"
@@ -40,8 +56,8 @@
                 <v-autocomplete
                   v-model="compra.categoria"
                   color="secondaryColor"
-                  :items="['Disponible', 'Ahorro', 'Devolucion', 'Tecnologia', 'Salud', 'Pagos Mensuales', 'Familia', 'Otro']"
-                  item-text="name"
+                  :items="plantillas"
+                  item-text="category"
                   label="Categoria"
                   class="custom-autocomplete"
                   clearable
@@ -193,6 +209,7 @@
 
 <script>
 import { createBox, updateBox } from '../../services/boxServices';
+import { getPlantillas } from "../../services/plantillaServices";
 
 export default {
 name: 'addCompra',
@@ -209,6 +226,7 @@ props: {
 },
 data() {
   return {
+    plantillas: [],
     detailBox: [],
     headers: [
       { text: '#', value: 'index' },
@@ -248,6 +266,9 @@ computed: {
       return sum + (parseFloat(detail.monto || 0 ))
     }, 0)
   }
+},
+beforeMount() {
+  this.getPlantillas()
 },
 methods: {
   toggleActions(detail) {
@@ -307,6 +328,15 @@ methods: {
       this.close();
     } catch (error) {
       console.error('Error al guardar usuario:', error);
+    }
+  },
+  async getPlantillas() {
+    try {
+      const plantillas = await getPlantillas()
+      this.plantillas = plantillas.filter(item => item.category === 'COMPRAS')
+      console.log(this.plantillas)
+    } catch (error) {
+      console.error('Error al obtener plantillas:', error)
     }
   },
   closeDialogDetail() {

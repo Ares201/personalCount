@@ -87,6 +87,12 @@
         <template v-slot:[`item.index`]="{ index }">
           {{ index + 1 }}
         </template>
+        <template v-slot:[`item.evento`]="{ item }">
+          {{ item.evento.title }}
+        </template>
+        <template v-slot:[`item.placaTracto`]="{ item }">
+          {{ item.placaTracto.title }}
+        </template>
         <template v-slot:[`item.fechaRepuesta`]="{ item }">
           {{ item.fechaRepuesta ? item.fechaRepuesta : '----/--/--'}}
         </template>
@@ -131,9 +137,9 @@
                 <v-col cols="12">
                   <v-card-text class="event-details">
                     <h3 class="mb-6"> 📢 CENTRO CONTROL INFORMA</h3>
-                    <div><strong>Evento:</strong> {{ event.evento }}</div>
+                    <div><strong>Evento:</strong> {{ event.evento.title }}</div>
                     <div><strong>Nivel:</strong> {{ event.nivel }}</div>
-                    <div><strong>Placa:</strong> {{ event.placaTracto }} / {{ event.placaCarreta }}</div>
+                    <div><strong>Placa:</strong> {{ event.placaTracto.plate }} / {{ event.placaCarreta.plate }}</div>
                     <div><strong>Fecha:</strong> {{ event.fecha }}</div>
                     <div><strong>Hora:</strong> {{ event.hora }}</div>
                     <div><strong>Estado:</strong> {{ event.estado }}</div>
@@ -225,21 +231,34 @@ export default {
         // 2. Creamos nuevo documento en la colección 'documents'
         const newDocId = await createDocument({
           ...eventData,
+          evento: event.evento.title,
+          operacion: event.contrato,
+          placaTracto: event.placaTracto.plate,
+          placaCarreta: event.placaCarreta.plate,
+          estado: 'Pendiente',
+          condition: event.estado,
+          detail: event.detalle,
           fechaEnvio: event.fecha,
-          estado: 'Pendiente' // ejemplo
+          ubicacion: event.ubicacion,
         })
-        console.log('Documento creado con ID:', newDocId)
+        Swal.fire({
+          icon: 'success',
+          title: 'Documento creado con ID:', newDocId,
+          text: 'El ingreso ha sido creado exitosamente.',
+          showConfirmButton: false,
+          timer: 1500
+        })
       } catch (error) {
-        console.error('Error al convertir documento:', error)
+        Swal.fire('Error al convertir documento:', error)
       }
     },
     copyToClipboard(event) {
       const formattedText = `
       📢 *CENTRO CONTROL INFORMA*
 
-      *Evento:* ${event.evento}
+      *Evento:* ${event.evento.title}
       *Nivel:* ${event.nivel}🟡
-      *Placa:* ${event.placaTracto} / ${event.placaCarreta}
+      *Placa:* ${event.placaTracto.plate} / ${event.placaCarreta.plate}
       *Fecha:* ${event.fecha}
       *Hora:* ${event.hora}
       *Estado:* ${event.estado}

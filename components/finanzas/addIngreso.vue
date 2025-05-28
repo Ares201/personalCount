@@ -163,7 +163,6 @@ methods: {
     try {
       const plantillas = await getPlantillas()
       this.plantillas = plantillas.filter(item => item.category === 'FINANZAS')
-      console.log('Plantillas', this.plantillas)
     } catch (error) {
       console.error('Error al obtener plantillas:', error)
     }
