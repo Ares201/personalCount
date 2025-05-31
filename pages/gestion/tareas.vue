@@ -140,7 +140,7 @@
                       {{ returnEstado(box).text }}
                     </v-chip>
                     <v-card-text>
-                      <p>{{ box.descripcion }}</p>
+                      <p>{{ box.titulo }}</p>
                       <strong>Monto:</strong>
                       <p>S/.{{ box.monto }}</p>
                     </v-card-text>

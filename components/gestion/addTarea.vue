@@ -13,7 +13,7 @@
                 <v-autocomplete
                   v-model="compra.titulo"
                   color="secondaryColor"
-                  :items="plantillas"
+                  :items="titleFiltered"
                   item-text="title"
                   label="Titulo"
                   class="custom-autocomplete"
@@ -66,7 +66,17 @@
                   hide-no-data
                   hide-selected
                   hide-details
-                />
+                >
+                 <template #append-item>
+                      <v-divider />
+                      <v-list-item link @click="OpenDialogPlantilla()" class="fixed-option">
+                          <a>
+                            + Plantilla
+                          </a>
+                        </v-list-item>
+                      <v-divider />
+                    </template>
+                </v-autocomplete>
               </v-col>
               <v-col cols="12" md="12">
                 <v-text-field
@@ -203,6 +213,12 @@
           </v-btn>
           <v-btn color="neutralColor" text @click="close">Cancelar</v-btn>
       </v-card-actions>
+      <!-- Componente addPlantilla -->
+      <add-plantilla
+        :dialog = "dialogPlantilla"
+        @closedialog="closedialogPlantilla"
+        @savePlantilla="savePlantilla"
+      />
     </v-card>
   </v-dialog>
 </template>
@@ -210,9 +226,13 @@
 <script>
 import { createBox, updateBox } from '../../services/boxServices';
 import { getPlantillas } from "../../services/plantillaServices";
+import addPlantilla from '../../components/configuracion/addPlantilla.vue';
 
 export default {
 name: 'addCompra',
+components: {
+  addPlantilla
+},
 props: {
   dialog: { type: Boolean, default: false },
   boxs: { type: Object, default: () => ({
@@ -238,6 +258,7 @@ data() {
     compra: { ...this.boxs },
     newDetail: { detalle: '', monto: 0, estado: false }, // Para capturar datos del modal
     dialogDetail: false,
+    dialogPlantilla: false,
     menuFecha: false,
     editIndex: null,
   }
@@ -260,6 +281,10 @@ watch: {
 computed: {
   formTitle() {
     return this.compra.id === null ? 'Nuevo Compra' : 'Editar Compra'
+  },
+   titleFiltered() {
+    if (!this.compra.categoria) return []
+    return this.plantillas.filter(item => item.category === this.compra.categoria)
   },
   totalDetail() {
     return this.detailBox.reduce((sum, detail)=>{
@@ -307,20 +332,21 @@ methods: {
       }));
       if (this.compra.id) {
         await updateBox(this.compra.id, {
+          titulo: this.compra.titulo,
           fecha: this.compra.fecha,
-          monto: this.detailBox.reduce((monto, detail) => monto + detail.monto, 0),
-          descripcion: this.compra.descripcion,
           categoria: this.compra.categoria,
+          descripcion: this.compra.descripcion,
+          monto: this.detailBox.reduce((monto, detail) => monto + detail.monto, 0),
           detailBox: this.detailBox
         });
       } else {
         // Crear nueva compra
         await createBox({
-          tipo: 'Compra',
+          titulo: this.compra.titulo,
           fecha: this.compra.fecha,
-          monto: this.detailBox.reduce((monto, detail) => monto + detail.monto, 0),
-          descripcion: this.compra.descripcion,
           categoria: this.compra.categoria,
+          descripcion: this.compra.descripcion,
+          monto: this.detailBox.reduce((monto, detail) => monto + detail.monto, 0),
           detailBox: this.detailBox
         });
       }
@@ -330,14 +356,29 @@ methods: {
       console.error('Error al guardar usuario:', error);
     }
   },
+  async savePlantilla() {
+    Swal.fire({
+      icon: 'success',
+      title: 'Plantilla guardada con éxito',
+      showConfirmButton: false,
+      timer: 1500
+    })
+  },
   async getPlantillas() {
     try {
       const plantillas = await getPlantillas()
-      this.plantillas = plantillas.filter(item => item.category === 'COMPRAS')
+      this.plantillas = plantillas.filter(item => item.category === 'COMPRAS' || item.category === 'TAREAS');
       console.log(this.plantillas)
     } catch (error) {
       console.error('Error al obtener plantillas:', error)
     }
+  },
+  OpenDialogPlantilla(){
+    this.dialogPlantilla = true
+  },
+  closedialogPlantilla() {
+    this.dialogPlantilla = false;
+    this.getPlantillas()
   },
   closeDialogDetail() {
     this.dialogDetail = false
@@ -352,6 +393,7 @@ methods: {
     this.$emit('closedialog')
     this.compra = {
       id: null,
+      titulo: '',
       fecha: '',
       monto: 0,
       descripcion: '',
