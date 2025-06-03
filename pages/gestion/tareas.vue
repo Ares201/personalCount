@@ -101,68 +101,82 @@
       </v-data-table>
     </v-card-text>
     <v-row v-else>
-      <v-col cols="12" sm="12">
-        <v-row dense>
-          <v-col
-            v-for="box in boxs.filter(item => item.estado === false)"
-            :key="box.id"
-            cols="12" sm="6" md="4"
-          >
-            <div
-              @touchstart="touchStart($event, box)"
-              @touchmove="touchMove"
-              @touchend="touchEnd(box)"
-              style="touch-action: pan-y;"
+      <v-col cols="12">
+        <div
+          v-for="(box, categoria) in boxs"
+          :key="categoria"
+          class="mb-4"
+        >
+          <div class="d-flex align-center mb-2">
+            <v-chip color="blue lighten-4" class="mr-2 text--primary">
+              {{ categoria }}
+            </v-chip>
+            <v-chip color="grey lighten-2" text-color="grey darken-3" small>
+              {{ box.length }} tarjetas
+            </v-chip>
+          </div>
+          <v-row dense>
+            <v-col
+              v-for="box in box.filter(item => item.estado === false)"
+              :key="box.id"
+              cols="12" sm="6" md="4"
             >
-              <v-card
-                @click="editCompra(box)"
-                class="pa-2 mb-4"
-                style="border: 2px solid orange; border-radius: 10px;"
+              <div
+                @touchstart="touchStart($event, box)"
+                @touchmove="touchMove"
+                @touchend="touchEnd(box)"
+                style="touch-action: pan-y;"
               >
-                <v-row dense>
-                  <v-col cols="4" class="d-flex justify-center align-center">
-                    <v-progress-circular
-                      :value="calculateProgress(box)"
-                      color="secondaryColor"
-                      rotate="360"
-                      size="50"
-                      width="5"
-                    >
-                      {{ calculateProgress(box) }}%
-                    </v-progress-circular>
-                  </v-col>
-                  <v-col cols="8">
-                    <v-chip
-                      :color="returnEstado(box).color"
-                      :text-color="returnEstado(box).textColor"
-                      class="ma-1"
-                    >
-                      {{ returnEstado(box).text }}
-                    </v-chip>
-                    <v-card-text>
-                      <p>{{ box.titulo }}</p>
-                      <strong>Monto:</strong>
-                      <p>S/.{{ box.monto }}</p>
-                    </v-card-text>
-                  </v-col>
-                </v-row>
-                <span class="d-flex justify-end grey--text text--darken-1 font-weight-medium">
-                  {{ box.fecha }}
-                </span>
-                <v-expand-transition>
-                  <div v-if="box.showActions" class="d-flex justify-end pa-2">
-                    <v-btn icon @click.stop="deleteCompra(box.id)">
-                      <v-icon color="error">mdi-delete</v-icon>
-                    </v-btn>
-                    <v-btn icon @click.stop="toggleActions(box)">
-                      <v-icon color="primary">mdi-close</v-icon>
-                    </v-btn>
-                  </div>
-                </v-expand-transition>
-              </v-card>
-            </div>
-          </v-col>
-        </v-row>
+                <v-card
+                  @click="editCompra(box)"
+                  class="pa-2 mb-4"
+                  style="border: 2px solid orange; border-radius: 10px;"
+                >
+                  <v-row dense>
+                    <v-col cols="4" class="d-flex justify-center align-center">
+                      <v-progress-circular
+                        :value="calculateProgress(box)"
+                        color="secondaryColor"
+                        rotate="360"
+                        size="50"
+                        width="5"
+                      >
+                        {{ calculateProgress(box) }}%
+                      </v-progress-circular>
+                    </v-col>
+                    <v-col cols="8">
+                      <v-chip
+                        :color="returnEstado(box).color"
+                        :text-color="returnEstado(box).textColor"
+                        class="ma-1"
+                      >
+                        {{ returnEstado(box).text }}
+                      </v-chip>
+                      <v-card-text>
+                        <p>{{ box.titulo }} - {{ box.descripcion }}</p>
+                        <strong>Monto:</strong>
+                        <p>S/.{{ box.monto }}</p>
+                      </v-card-text>
+                    </v-col>
+                  </v-row>
+                  <span class="d-flex justify-end grey--text text--darken-1 font-weight-medium">
+                    {{ box.fecha }}
+                  </span>
+                  <v-expand-transition>
+                    <div v-if="box.showActions" class="d-flex justify-end pa-2">
+                      <v-btn icon @click.stop="deleteCompra(box.id)">
+                        <v-icon color="error">mdi-delete</v-icon>
+                      </v-btn>
+                      <v-btn icon @click.stop="toggleActions(box)">
+                        <v-icon color="primary">mdi-close</v-icon>
+                      </v-btn>
+                    </div>
+                  </v-expand-transition>
+                </v-card>
+              </div>
+            </v-col>
+          </v-row>
+        </div>
       </v-col>
     </v-row>
     <!-- Componente addCompra -->
@@ -194,9 +208,10 @@ export default {
         { text: 'Estado', value: 'estado', sortable: false },
         { text: 'Acciones', value: 'acciones', sortable: false }
       ],
+      boxs: [],
+      groupedBoxs: {},
       dialogComponent: false,
       model: false,
-      boxs: [],
       selectedCompra: null,
       searchQueryGeneral: null,
       selectedEstado: null,
@@ -209,18 +224,21 @@ export default {
   },
   computed: {
     filteredDocuments() {
-      return this.boxs.filter(doc => {
+      // Asegúrate de que boxs tiene valores
+      const allDocs = Object.values(this.boxs || {}).flat();
+      return allDocs.filter(doc => {
         const estadoMatch =
           !this.selectedEstado ||
           (this.selectedEstado === 'Pendiente' && !doc.estado) ||
           (this.selectedEstado === 'Cancelado' && doc.estado);
+
         const fechaMatch = !this.fechaFiltro || doc.fechaEnvio === this.fechaFiltro;
-        // Búsqueda general (si hay searchQueryGeneral)
         const generalSearchMatch = !this.searchQueryGeneral ||
-        Object.values(doc).some(value => {
-          if (value === null || value === undefined) return false;
-          return value.toString().toLowerCase().includes(this.searchQueryGeneral.toLowerCase());
-        });
+          Object.values(doc).some(value => {
+            if (value === null || value === undefined) return false;
+            return value.toString().toLowerCase().includes(this.searchQueryGeneral.toLowerCase());
+          });
+
         return estadoMatch && fechaMatch && generalSearchMatch;
       });
     }
@@ -229,18 +247,29 @@ export default {
     await this.fetchCompras()
   },
   methods: {
-    async fetchCompras(){
+    async fetchCompras() {
       try {
-        const allBoxs = await getBoxs()
-        this.boxs = allBoxs
-        .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
-        .filter(box => box.tipo === 'Compra')
-        .map(box => ({
-          ...box,
-          estado: box.detailBox.length > 0 && box.detailBox.every(detail => detail.estado)
-        }));
+        const allBoxs = await getBoxs();
+        const compras = allBoxs
+          .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+          .filter(box => box.tipo === 'Compra')
+          .map(box => ({
+            ...box,
+            estado: box.detailBox.length > 0 && box.detailBox.every(detail => detail.estado),
+          }));
+
+        // Agrupar por categoría
+        const grouped = {};
+        compras.forEach(box => {
+          if (!grouped[box.categoria]) {
+            grouped[box.categoria] = [];
+          }
+          grouped[box.categoria].push(box);
+        });
+
+        this.boxs = grouped;
       } catch (error) {
-        console.log('Error al obtener Registros', error)
+        console.log('Error al obtener Registros', error);
       }
     },
     openNewDocument(){
