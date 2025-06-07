@@ -13,9 +13,9 @@
         </v-col>
         <v-col cols="12" md="4">
           <v-text-field
-            v-model="searchQuery"
+            v-model="searchQueryGeneral"
             color="secondaryColor"
-            label="Buscar Vehiculo"
+            label="Buscar..."
             append-icon="mdi-magnify"
             class="mt-2"
             clearable
@@ -24,11 +24,11 @@
             hide-details
           />
         </v-col>
-        <v-col cols="12" md="4">
-          <v-select
-            v-model="searchQuery"
+        <v-col cols="12" md="3">
+          <v-autocomplete
+            v-model="selectTypeVehicle"
             :items="vehiclesList"
-            label="Filtrar por"
+            label="Filtrar Tipo de Unidad"
             color="secondaryColor"
             class="mt-2"
             outlined
@@ -36,17 +36,17 @@
             hide-details
             clearable
           >
-          </v-select>
+          </v-autocomplete>
         </v-col>
       </v-row>
     </v-card-title>
     <v-card-text>
       <v-data-table
         :headers="headers"
-        :items="vehiculos"
-        :search="searchQuery"
+        :items="filteredVehicles"
         item-value="id"
         dense
+        mobile-breakpoint="0"
       >
         <template v-slot:[`item.index`]="{ index }">
           {{ index + 1 }}
@@ -85,28 +85,34 @@ export default {
         { text: 'Tipo de Unidad', value: 'vehicleType', sortable: false },
         { text: 'Placa', value: 'plate', sortable: false },
         { text: 'Marca', value: 'brand', sortable: false },
-        { text: 'Operacion', value: 'operations', sortable: false },
         { text: 'Tiene Cámara', value: 'hasCamera', sortable: false },
         { text: 'Acciones', value: 'acciones', sortable: false }
       ],
       vehiculos: [],
       search: '',
       dialog: false,
+      selectedVehicle: {},
       dialogComponent: false,
-      selectedVehicle: null,
-      searchQuery: '',
+      selectTypeVehicle: null,
+      searchQueryGeneral: null,
     }
   },
   computed: {
-    filteredHworks() {
+    filteredVehicles() {
       return this.vehiculos.filter(doc => {
-        const searchMatch = !this.searchQuery || doc.name.toString().includes(this.searchQuery);
-        return searchMatch;
+        const vehicleMatch = !this.selectTypeVehicle || doc.vehicleType === this.selectTypeVehicle;
+        // Búsqueda general (si hay searchQueryGeneral)
+        const generalSearchMatch = !this.searchQueryGeneral ||
+        Object.values(doc).some(value => {
+          if (value === null || value === undefined) return false;
+          return value.toString().toLowerCase().includes(this.searchQueryGeneral.toLowerCase());
+        });
+        return vehicleMatch && generalSearchMatch;
       });
     },
     vehiclesList() {
       return [...new Set(this.vehiculos.map(t => t.vehicleType))]
-    },
+    }
   },
   async beforeMount() {
     await this.fetchVehicles()

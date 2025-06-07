@@ -37,20 +37,6 @@
                 hide-details
               />
             </v-col>
-            <v-col cols="6">
-              <v-autocomplete
-                v-model="currentVehicle.operations"
-                color="secondaryColor"
-                :items="operations"
-                item-text="name"
-                clearable
-                outlined
-                dense
-                hide-no-data
-                hide-selected
-                hide-details
-              ></v-autocomplete>
-            </v-col>
             <v-col cols="12" md="6">
               <v-switch
                 v-model="currentVehicle.hasCamera"
@@ -82,7 +68,6 @@
 <script>
 import Swal from 'sweetalert2'
 import { createVehicle,  updateVehicle } from '~/services/vehicleServices'
-import { getOperationMines } from '~/services/operationMineServices'
 export default {
 name: 'addVehicle',
 props: {
@@ -92,7 +77,6 @@ props: {
       id: null,
       vehicleType: '',
       plate: '',
-      operations: '',
       brand: '',
       hasCamera: false,
     })
@@ -101,7 +85,6 @@ props: {
 data() {
   return {
     currentVehicle: { ...this.vehicle },
-    operations: []
   }
 },
 watch: {
@@ -117,16 +100,12 @@ computed: {
     return this.currentVehicle.id === null ? 'Nuevo Vehiculo' : 'Editar Vehiculo'
   },
 },
-beforeMount () {
-  this.getOperationMines()
-},
 methods: {
   async saveVehicle() {
     try {
       const docData = {
         vehicleType: this.currentVehicle.vehicleType,
         plate: this.currentVehicle.plate,
-        operations: this.currentVehicle.operations,
         brand: this.currentVehicle.brand,
         hasCamera: this.currentVehicle.hasCamera,
       }
@@ -143,13 +122,6 @@ methods: {
         html: `<pre>${error.message || error}</pre>`,
         icon: 'error'
       })
-    }
-  },
-  async getOperationMines() {
-    try {
-      this.operations = await getOperationMines()
-    } catch (error) {
-      Swal.fire('Error al obtener empleados:', error);
     }
   },
   close () {

@@ -154,8 +154,16 @@
                       </v-chip>
                       <v-card-text>
                         <p>{{ box.titulo }} - {{ box.descripcion }}</p>
-                        <strong>Monto:</strong>
-                        <p>S/.{{ box.monto }}</p>
+                        <v-chip
+                          v-if="box.categoria === 'COMPRAS'"
+                          class="ma-1"
+                          color="primaryColor"
+                          text-color="white"
+                        >
+                          {{
+                            box.categoria === 'COMPRAS' ? `S/.${box.monto}` : ''
+                          }}
+                        </v-chip>
                       </v-card-text>
                     </v-col>
                   </v-row>

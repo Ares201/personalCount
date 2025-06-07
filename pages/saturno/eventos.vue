@@ -166,7 +166,6 @@
     />
   </v-card>
 </template>
-
 <script>
 import Swal from "sweetalert2";
 import addEvent from '../../components/saturno/addEvento.vue';
@@ -201,7 +200,7 @@ export default {
       selectedOperacion: null,
       selectedEvent: null,
       searchQueryGeneral: null,
-      fechaFiltro: this.getFechaHoy()
+      fechaFiltro: this.getTodayLocalDate()
     };
   },
   computed: {
@@ -252,30 +251,43 @@ export default {
         Swal.fire('Error al convertir documento:', error)
       }
     },
-    copyToClipboard(event) {
-      const formattedText = `
-      📢 *CENTRO CONTROL INFORMA*
+ copyToClipboard(event) {
+  const formattedText = `
+📢 *CENTRO CONTROL INFORMA*
 
-      *Evento:* ${event.evento.title}
-      *Nivel:* ${event.nivel}🟡
-      *Placa:* ${event.placaTracto.plate} / ${event.placaCarreta.plate}
-      *Fecha:* ${event.fecha}
-      *Hora:* ${event.hora}
-      *Estado:* ${event.estado}
-      *Cámaras:* ${event.camaras}
-      *Operador:* ${event.employee.name}
-      *Contrato:* ${event.contrato}
-      *Ubicación:* ${event.ubicacion}
-      *Detalles:* ${event.detalle}
-      `.trim();
-      navigator.clipboard.writeText(formattedText).then(() => {
-        // alert("Texto copiado, ahora puedes pegarlo en WhatsApp 📲")
-      }).catch(err => {
-        console.error("Error al copiar: ", err);
-      });
-    },
+*Evento:* ${event.evento.title}
+*Nivel:* ${event.nivel}🟡
+*Placa:* ${event.placaTracto.plate} / ${event.placaCarreta.plate}
+*Fecha:* ${event.fecha}
+*Hora:* ${event.hora}
+*Estado:* ${event.estado}
+*Cámaras:* ${event.camaras}
+*Operador:* ${event.employee.name}
+*Contrato:* ${event.contrato}
+*Ubicación:* ${event.ubicacion}
+*Detalles:* ${event.detalle}
+  `
+    .trim();
+  navigator.clipboard.writeText(formattedText)
+    .then(() => {/*…*/})
+    .catch(err => console.error(err));
+},
     switchMode(){
       this.model = !this.model
+    },
+    getTodayLocalDate() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = (today.getMonth() + 1).toString().padStart(2, '0');
+      const day = today.getDate().toString().padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    },
+    getCurrentLocalTime() {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      return `${hours}:${minutes}:${seconds}`;
     },
     openNewEvent() {
       this.selectedEvent = {
@@ -284,8 +296,8 @@ export default {
         nivel: '',
         placaTracto: '',
         placaCarreta: '',
-        fecha: '',
-        hora: '',
+        fecha: this.getTodayLocalDate(),
+        hora: this.getCurrentLocalTime(),
         estado: '',
         camaras: '',
         employee: '',
@@ -297,10 +309,6 @@ export default {
     },
     exportExcel(){
       alert('Se esta trabajando...')
-    },
-    getFechaHoy() {
-      const hoy = new Date();
-      return hoy.toISOString().split("T")[0]; // Formato YYYY-MM-DD
     },
     async getOperationMines() {
       try {

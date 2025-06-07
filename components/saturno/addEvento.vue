@@ -87,7 +87,6 @@
                     clearable
                     return-object
                     hide-details
-                    @change="updateCamera"
                   >
                     <template #append-item>
                       <v-divider />
@@ -188,7 +187,6 @@
                     outlined
                     dense
                     hide-details
-                    readonly
                   />
                 </v-col>
                 <v-col cols="6">
@@ -383,10 +381,7 @@ export default {
     async getPlantillas() {
       try {
         const plantillas = await getPlantillas()
-        this.plantillas = plantillas.filter(item =>
-          item.category === 'MECANICA' ||
-          item.category === 'NEUMATICOS'
-        )
+        this.plantillas = plantillas.filter(item => item.type === 'Saturno')
       } catch (error) {
         console.error('Error al obtener plantillas:', error)
       }
@@ -432,8 +427,10 @@ export default {
     },
     updateCamera(vehicle) {
       console.log(vehicle)
+      this.event.camaras = ''
+      this.event.contrato = null
       if (vehicle) {
-        this.event.camaras = vehicle.camera ? 'Si Cuenta' : 'No Cuenta';
+        this.event.camaras = vehicle.hasCamera ? 'Si Cuenta' : 'No Cuenta';
         this.event.contrato = vehicle.operations || null;
       }
     },

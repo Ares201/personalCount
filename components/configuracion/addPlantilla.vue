@@ -27,7 +27,16 @@
                 hide-details
               />
             </v-col>
-             <v-col cols="12" md="12">
+            <v-col cols="12" md="6">
+              <v-text-field
+                label="Tipo"
+                v-model="currentPlantilla.type"
+                outlined
+                dense
+                hide-details
+              />
+            </v-col>
+             <v-col cols="12" md="6">
               <v-select
                 label="Nivel"
                 v-model="currentPlantilla.level"
@@ -75,6 +84,7 @@ props: {
       id: null,
       title: '',
       category: '',
+      type: '',
       level: '',
       description: ''
     })
@@ -107,6 +117,7 @@ methods: {
       const docData = {
         title: this.currentPlantilla.title,
         category: this.currentPlantilla.category,
+        type: this.currentPlantilla.type,
         level: this.currentPlantilla.level,
         description: this.currentPlantilla.description,
       }
@@ -131,6 +142,7 @@ methods: {
       id: null,
       title: '',
       category: '',
+      type: '',
       level: '',
       description: ''
     }

@@ -94,15 +94,11 @@
                 <v-btn color="success darken-1" icon outlined @click="dialogDetail = true">
                   <v-icon>mdi-plus</v-icon>
                 </v-btn>
-                <v-chip
-                  class="ma-1"
-                  color="primaryColor"
-                  text-color="white"
-                >
+                <v-chip class="ma-1" color="secondaryColor" text-color="white">
                    {{
                       compra.categoria === 'COMPRAS'
-                        ? (totalDetail ? 'Total: S/. ' + totalDetail : 'Total: S/. 0')
-                        : `${detailBox.length}`
+                        ? (totalDetail ? `Total: S/. ${totalDetail}` : 'Total: S/. 0')
+                        : `Completados: ${detailBox.filter(item => item.estado).length} de ${detailBox.length}`
                     }}
                 </v-chip>
               </v-col>
@@ -391,11 +387,7 @@ methods: {
     try {
       const plantillas = await getPlantillas()
       this.plantillas = plantillas.filter(item =>
-        item.category === 'COMPRAS' ||
-        item.category === 'TRABAJO' ||
-        item.category === 'TAREAS FINANCIERAS'
-      );
-      console.log(this.plantillas)
+        item.type === 'Tareas');
     } catch (error) {
       console.error('Error al obtener plantillas:', error)
     }

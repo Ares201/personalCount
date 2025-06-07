@@ -82,6 +82,7 @@ export default {
         { text: '#', value: 'index', sortable: false },
         { text: 'Titulo', value: 'title', sortable: false },
         { text: 'Categoria', value: 'category', sortable: false },
+        { text: 'Tipo', value: 'type', sortable: false },
         { text: 'Descripcion', value: 'description', sortable: false },
         { text: 'Nivel', value: 'level', sortable: false },
         { text: 'Acciones', value: 'acciones', sortable: false }
