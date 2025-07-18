@@ -177,6 +177,7 @@ export default {
         title: 'Saturno',
         children: [
           { title: 'Dashboard', to:'/saturno/dashboard' },
+          { title: 'Asignacion', to:'/saturno/asignacion' },
           { title: 'Transporte', to:'/saturno/transporteMinerales' },
           { title:'Horas Laborales', to:'/saturno/horasLaborales' },
           { title:'Eventos', to:'/saturno/eventos' },

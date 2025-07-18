@@ -2,10 +2,6 @@
   <div>
     <v-row>
       <v-col cols="12" md="12" sm="12" lg="12">
-        <v-card-title class="headline primary white--text">
-          <v-icon left>mdi-truck</v-icon>
-          Gestión de Transporte - {{ currentMineName }}
-        </v-card-title>
         <v-card-actions class="px-4">
           <v-btn @click="showDashboard = !showDashboard" :color="showDashboard ? 'primary' : 'grey lighten-2'" class="mr-2">
             <v-icon left>mdi-view-dashboard</v-icon>

@@ -5,7 +5,7 @@
         <v-col cols="12" class="d-flex justify-space-between align-center">
           <span class="text-h6">
             <v-icon color="primaryColor" class="mr-3">mdi-mine</v-icon>
-            OPERACIONES - MINA
+            OPERACIONES
           </span>
           <v-btn color="primaryColor" small fab dark @click="dialogComponent= true">
             <v-icon dark>mdi-plus</v-icon>

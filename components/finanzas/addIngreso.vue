@@ -144,7 +144,6 @@ methods: {
         })
       } else {
         await createBox(docData)
-        console.log(docData)
         Swal.fire({
           icon: 'success',
           title: 'Registro creado',

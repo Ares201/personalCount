@@ -139,12 +139,12 @@
                     <h3 class="mb-6"> 📢 CENTRO CONTROL INFORMA</h3>
                     <div><strong>Evento:</strong> {{ event.evento.title }}</div>
                     <div><strong>Nivel:</strong> {{ event.nivel }}</div>
-                    <div><strong>Placa:</strong> {{ event.placaTracto.plate }} / {{ event.placaCarreta.plate }}</div>
+                    <div><strong>Placa:</strong> {{ event.placaTracto.plate }} / {{ event.placaCarreta }}</div>
                     <div><strong>Fecha:</strong> {{ event.fecha }}</div>
                     <div><strong>Hora:</strong> {{ event.hora }}</div>
                     <div><strong>Estado:</strong> {{ event.estado }}</div>
                     <div><strong>Cámaras:</strong> {{ event.camaras }}</div>
-                    <div><strong>Operador:</strong> {{ event.employee.name }}</div>
+                    <div><strong>Operador:</strong> {{ event.employee }}</div>
                     <div><strong>Contrato:</strong> {{ event.contrato }}</div>
                     <div><strong>Ubicación:</strong> {{ event.ubicacion }}</div>
                     <div><strong>Detalles:</strong> {{ event.detalle }}</div>
@@ -184,11 +184,11 @@ export default {
       headers: [
         { text: '#', value: 'index', sortable: false },
         { text: 'Evento', value: 'evento' },
-        { text: 'Placa', value: 'placaTracto' },
+        { text: 'Placa', value: 'placaTracto.plate' },
         { text: 'Fecha', value: 'fecha' },
         { text: 'Hora', value: 'hora' },
         { text: 'Estado', value: 'estado' },
-        { text: 'Operador', value: 'employee.name' },
+        { text: 'Operador', value: 'employee' },
         { text: 'Contrato', value: 'contrato' },
         { text: 'Acciones', value: 'acciones', sortable: false }
       ],
@@ -218,6 +218,7 @@ export default {
       });
     }
   },
+
   async beforeMount() {
     await this.fetchEvents();
     await this.getOperationMines()
@@ -252,17 +253,18 @@ export default {
       }
     },
  copyToClipboard(event) {
+  console.log('Copiando al portapapeles:', event);
   const formattedText = `
 📢 *CENTRO CONTROL INFORMA*
 
 *Evento:* ${event.evento.title}
 *Nivel:* ${event.nivel}🟡
-*Placa:* ${event.placaTracto.plate} / ${event.placaCarreta.plate}
+*Placa:* ${event.placaTracto.plate} / ${event.placaCarreta}
 *Fecha:* ${event.fecha}
 *Hora:* ${event.hora}
 *Estado:* ${event.estado}
 *Cámaras:* ${event.camaras}
-*Operador:* ${event.employee.name}
+*Operador:* ${event.employee}
 *Contrato:* ${event.contrato}
 *Ubicación:* ${event.ubicacion}
 *Detalles:* ${event.detalle}

@@ -24,6 +24,10 @@
             hide-details
           />
         </v-col>
+        <v-spacer></v-spacer>
+        <v-col cols="12" class="d-flex justify-end">
+          <v-btn icon><v-icon color="green">mdi-file-excel</v-icon></v-btn>
+        </v-col>
       </v-row>
     </v-card-title>
     <v-card-text>
@@ -36,6 +40,13 @@
       >
         <template v-slot:[`item.index`]="{ index }">
           {{ index + 1 }}
+        </template>
+        <template v-slot:[`item.state`]="{ item }">
+          <v-chip
+            :color="returnEstado(item).color"
+            :text-color="returnEstado(item).text"
+            class="ma-1"
+            >{{ item.state }}</v-chip>
         </template>
         <template v-slot:[`item.acciones`]="{ item }">
           <v-icon small color="secondaryColor" @click="editEmployee(item)">mdi-pencil</v-icon>
@@ -65,10 +76,10 @@ export default {
     return {
       headers: [
         { text: '#', value: 'index', sortable: false },
-        { text: 'Nombre', value: 'name', sortable: false },
+        { text: 'Nombre Completo', value: 'name', sortable: false },
+        { text: 'Telf. Coorporativo', value: 'phoneCorporate', sortable: false },
         { text: 'Puesto de Trabajo', value: 'workstation', sortable: false },
-        { text: 'Area', value: 'area', sortable: false },
-        { text: 'Horas de Trabajo', value: 'workHours', sortable: false },
+        { text: 'Estado', value: 'state', sortable: false },
         { text: 'Acciones', value: 'acciones', sortable: false }
       ],
       empleados: [],
@@ -111,6 +122,24 @@ export default {
           console.error('Error al eliminar empleado:', error)
         }
       }
+    },
+    returnEstado(item) {
+      let color = "default";
+      let text = "default";
+
+      if (item.state === "activo") {
+        color = "#C8E6C9";
+        text = "#2E7D32";
+      } else if (item.state === "inactivo") {
+        color = "#FFF9C4";
+        text = "#F9A825";
+      } else if (item.state === "Retirado") {
+        color = "#E1BEE7";
+        text = "#6A1B9A";
+      } else if (item.state === "bloqueado") {
+        color = "#FFCDD2";
+        text = "#C62828";        }
+      return { color, text };
     },
     closedialog() {
       this.dialogComponent = false

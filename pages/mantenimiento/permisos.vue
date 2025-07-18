@@ -62,6 +62,7 @@ export default {
         "/finanzas/compras",
         // Saturno
         "/saturno/dashboard",
+        "/saturno/asignacion",
         "/saturno/flashreport",
         "/saturno/eventos",
         "/saturno/horasLaborales",

@@ -92,6 +92,10 @@
             <v-date-picker color="secondaryColor" v-model="fechaFiltro" @input="menuFecha = false"></v-date-picker>
           </v-menu>
         </v-col>
+       <v-col cols="12" md="3" class="d-flex align-center">
+          <v-icon color="grey" class="mr-2">mdi-chart-line</v-icon>
+          <span class="text-caption grey--text">{{ filteredDocuments.length || 0 }} Registros encontrados</span>
+        </v-col>
       </v-row>
       <!-- <v-col cols="12" md="4" class="d-flex justify-end">
         <v-btn color="green" dark @click="exportExcel">

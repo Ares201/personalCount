@@ -62,6 +62,20 @@
                     hide-details
                     @change="updateCamera"
                   >
+                    <template #item="{ item }">
+                      <v-list-item-content>
+                        <v-list-item-title class="d-flex align-center">
+                          <v-icon
+                            small
+                            :color="item.status === 'Asignado' ? 'green' : 'amber'"
+                            class="mr-2"
+                          >
+                            mdi-circle
+                          </v-icon>
+                          {{ item.plate }}
+                        </v-list-item-title>
+                      </v-list-item-content>
+                    </template>
                     <template #append-item>
                       <v-divider />
                       <v-list-item link @click="OpenDialogVehicle()" class="fixed-option">
@@ -73,31 +87,15 @@
                     </template>
                   </v-autocomplete>
                 </v-col>
-                <v-col cols="12" md="3">
+                <v-col cols="3">
                   <v-label>Placa Carreta:</v-label>
-                  <v-autocomplete
-                    :items="carretaVehicles"
+                  <v-text-field
                     v-model="event.placaCarreta"
-                    item-text="plate"
-                    item-value="id"
-                    color="secondaryColor"
-                    class="custom-autocomplete"
                     outlined
                     dense
-                    clearable
-                    return-object
                     hide-details
-                  >
-                    <template #append-item>
-                      <v-divider />
-                      <v-list-item link @click="OpenDialogVehicle()" class="fixed-option">
-                          <a>
-                            + Placa Carreta
-                          </a>
-                        </v-list-item>
-                      <v-divider />
-                    </template>
-                  </v-autocomplete>
+                    readonly
+                  />
                 </v-col>
                 <v-col cols="12" md="3">
                   <v-label>Fecha:</v-label>
@@ -135,29 +133,15 @@
                     hide-details
                   />
                 </v-col>
-                <v-col cols="12" md="6">
+                <v-col cols="6">
                   <v-label>Empleado:</v-label>
-                  <v-autocomplete
-                    :items="employees"
+                  <v-text-field
                     v-model="event.employee"
                     outlined
                     dense
-                    clearable
-                    item-text="name"
-                    item-value="id"
-                    return-object
                     hide-details
-                  >
-                    <template #append-item>
-                      <v-divider />
-                      <v-list-item link @click="OpenDialogEmployee()" class="fixed-option">
-                          <a>
-                            + Empleado
-                          </a>
-                        </v-list-item>
-                      <v-divider />
-                    </template>
-                  </v-autocomplete>
+                    readonly
+                  />
                 </v-col>
                 <v-col cols="3">
                   <v-label>Estado:</v-label>
@@ -233,9 +217,8 @@
 <script>
 import Swal from 'sweetalert2'
 import { createEvent, updateEvent } from '../../services/eventServices';
+import { getAssignments } from '../../services/assignmentsServices';
 import { getPlantillas } from '../../services/plantillaServices';
-import { getEmployees } from '../../services/employeeServices';
-import { getVehicles } from '../../services/vehicleServices';
 import addEmployee from '../../components/configuracion/addEmployee';
 import addVehicle from '../../components/configuracion/addVehicle.vue';
 import addPlantilla from '../../components/configuracion/addPlantilla.vue';
@@ -278,6 +261,7 @@ export default {
       plantillas: [],
       employees : [],
       vehicles: [],
+      assignments: [],
       event: { ...this.events },
     }
   },
@@ -317,16 +301,22 @@ export default {
       return this.event.id === null ? 'Nuevo Evento' : 'Editar Evento'
     },
     tractoVehicles() {
-      return this.vehicles.filter(vehicle => vehicle.vehicleType === 'TRACTO')
-    },
-    carretaVehicles() {
-      return this.vehicles.filter(vehicle => vehicle.vehicleType === 'CARRETA')
+      this.getAssignments()
+      return this.assignments
+        .filter(assign => assign.status === 'Asignado' || assign.status === 'En mantenimiento')
+        .map(assign => ({
+          plate: assign.tractoId.plate,
+          status: assign.status,
+          hasCamera: assign.tractoId.hasCamera,
+          plateCarreta: assign.carretaId.plate,
+          employee: assign.employeeId.name,
+          operations: assign.operationId.name,
+        }));
     },
   },
   beforeMount() {
+    this.getAssignments()
     this.getPlantillas()
-    this.getEmployees()
-    this.getVehicles()
   },
   methods: {
     async saveEvent() {
@@ -369,7 +359,6 @@ export default {
       }
     },
     OpenDialogEmployee(){
-      console.log(this.dialogEmployee)
       this.dialogEmployee = true
     },
     OpenDialogVehicle(){
@@ -378,27 +367,19 @@ export default {
     OpenDialogPlantilla(){
       this.dialogPlantilla = true
     },
+    async getAssignments() {
+      try {
+        this.assignments = await getAssignments()
+      } catch (error) {
+        console.error('Error al obtener asignaciones:', error)
+      }
+    },
     async getPlantillas() {
       try {
         const plantillas = await getPlantillas()
         this.plantillas = plantillas.filter(item => item.type === 'Saturno')
       } catch (error) {
         console.error('Error al obtener plantillas:', error)
-      }
-    },
-    async getEmployees() {
-      try {
-        this.employees = await getEmployees()
-        console.log(this.employees)
-      } catch (error) {
-        console.error('Error al obtener empleados:', error)
-      }
-    },
-    async getVehicles() {
-      try {
-        this.vehicles = await getVehicles()
-      } catch (error) {
-        console.error('Error al obtener vehiculos:', error)
       }
     },
     saveEmployees() {
@@ -425,17 +406,17 @@ export default {
         timer: 1500
       })
     },
-    updateCamera(vehicle) {
-      console.log(vehicle)
+    updateCamera(tracto) {
       this.event.camaras = ''
       this.event.contrato = null
-      if (vehicle) {
-        this.event.camaras = vehicle.hasCamera ? 'Si Cuenta' : 'No Cuenta';
-        this.event.contrato = vehicle.operations || null;
+      if (tracto) {
+        this.event.camaras = tracto.hasCamera ? 'Si Cuenta' : 'No Cuenta';
+        this.event.contrato = tracto.operations || null;
+        this.event.placaCarreta = tracto.plateCarreta;
+        this.event.employee = tracto.employee
       }
     },
     updateLevel(plantilla) {
-      console.log(plantilla)
       if (plantilla) {
         this.event.nivel = plantilla.level
         this.event.detalle = plantilla.description
@@ -445,11 +426,9 @@ export default {
     },
     closedialogEmployee() {
       this.dialogEmployee = false;
-      this.getEmployees()
     },
     closedialogVehicle() {
       this.dialogVehicle = false;
-      this.getVehicles()
     },
     closedialogPlantilla() {
       this.dialogPlantilla = false;
