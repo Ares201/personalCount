@@ -236,7 +236,7 @@ import { getAssignments, updateAssignment , deleteAssignment } from '../../servi
 
 export default {
   name: 'Asignacion',
-  components: {
+  components: { 
     addAsignacion,
   },
   data() {
