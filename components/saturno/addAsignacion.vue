@@ -237,8 +237,8 @@ export default {
       try {
         if (this.$refs.form.validate()) {
           const tractoPlate = this.localAssignment.tractoId?.plate;
-          const carretaPlate = this.localAssignment.carretaId?.plate;
-          const employeeName = this.localAssignment.employeeId?.name;
+          const carretaPlate = this.localAssignment.carretaId?.plate || null;
+          const employeeName = this.localAssignment.employeeId?.name || null;
           if (tractoPlate || carretaPlate || employeeName) {
             const { tractoExists, carretaExists, nameExists, existingAssignments } = await checkExistingPlates(
               tractoPlate,
@@ -283,7 +283,7 @@ export default {
           }
           const assignmentData = {
             tractoId: this.localAssignment.tractoId,
-            carretaId: this.localAssignment.carretaId,
+            carretaId: this.localAssignment.carretaId || null,
             employeeId: this.localAssignment.employeeId,
             operationId: this.localAssignment.operationId,
             status: this.localAssignment.id ? this.localAssignment.status : "Asignado",
